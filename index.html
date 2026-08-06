@@ -491,7 +491,7 @@
   </div>
 
 <script>
-  const GEMINI_API_KEY = 'AQ.Ab8RN6KXQ-_U30N_2U1L3SbHexj4aEkqB687L1kowWpDPoUsnQ';
+  const GEMINI_API_KEY = 'AQ.Ab8RN6LjuQE4Y01bASVnabfKlNFWkksmaHaAnPZjhyvsML-J5A';
 
   const SHEET_ID = '1ypmvlBQ6HvIYLRQbKX2q3gosZtJCff3bCfrdX6sJ8YI';
   const GIDS = {
@@ -1053,14 +1053,7 @@
 
     fallbackText += `<span style="color:#276749; font-weight:700;">💡 店長提醒：</span>請確實完成各項交接與物流確認，給顧客最專業的大學眼鏡品質，大家加油！`;
 
-    summaryEl.innerHTML = `
-      <div class="ai-error-box">
-        <strong>⚠️ API 配額上限或頻率限制：</strong><br>
-        ${errorDetails}
-        <em>(已自動切換為本機備用講稿 👇)</em>
-      </div>
-      ${fallbackText}
-    `;
+    
   }
 
   window.onload = loadAllSheets;
