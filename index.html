@@ -17,15 +17,15 @@
 
   body {
     font-family: "PingFang TC", "Microsoft JhengHei", "Noto Sans CJK TC", sans-serif;
-    font-size: 7.5pt;
-    line-height: 1.18;
+    font-size: 8.5pt;
+    line-height: 1.2;
     color: #2d3748;
     margin: 0;
     padding: 0;
     background-color: #fffaf5;
   }
 
-  /* 全頁式 AI 分析遮罩 (極簡正圓眼鏡 ) */
+  /* 全頁式 AI 分析遮罩 (極簡正圓眼鏡) */
   .full-page-mask {
     position: fixed;
     top: 0;
@@ -79,7 +79,7 @@
   }
 
   .mask-subtext {
-    font-size: 8.5pt;
+    font-size: 9pt;
     color: #c05621;
     font-weight: 600;
   }
@@ -105,7 +105,7 @@
     padding: 4px 12px;
     border-radius: 12px;
     cursor: pointer;
-    font-size: 7.5pt;
+    font-size: 8pt;
     font-weight: 600;
   }
 
@@ -130,7 +130,7 @@
   }
 
   .header-title {
-    font-size: 12pt;
+    font-size: 13pt;
     font-weight: 800;
     color: #9c4221;
     letter-spacing: 0.5px;
@@ -141,7 +141,7 @@
     border-radius: 4px;
     padding: 2px 6px;
     background-color: #fffaf0;
-    font-size: 7.5pt;
+    font-size: 8pt;
   }
 
   /* 區塊標題 */
@@ -151,7 +151,7 @@
   }
 
   .section-title {
-    font-size: 7.5pt;
+    font-size: 8.5pt;
     font-weight: 700;
     padding: 2px 5px;
     border-radius: 0 3px 3px 0;
@@ -174,18 +174,19 @@
   table.data-table th, 
   table.data-table td {
     border: 1px solid #feebc8;
-    padding: 2px 3px;
+    padding: 2.5px 4px;
     text-align: left;
     word-wrap: break-word;
     overflow-wrap: break-word;
     vertical-align: middle;
+    font-size: 8pt;
   }
 
   .theme-amber table.data-table th {
     background-color: #dd6b20;
     color: #ffffff;
     font-weight: 700;
-    font-size: 7pt;
+    font-size: 7.5pt;
     text-align: center;
     white-space: nowrap;
   }
@@ -196,11 +197,11 @@
     text-overflow: ellipsis;
   }
 
-  .font-small { font-size: 6.5pt !important; }
+  .font-small { font-size: 7pt !important; }
   
   /* 時間雙列微縮排版 */
   .time-split {
-    font-size: 6pt !important;
+    font-size: 6.5pt !important;
     line-height: 1.05;
     color: #4a5568;
   }
@@ -221,7 +222,7 @@
     background-color: #3182ce;
     color: #ffffff;
     font-weight: 700;
-    font-size: 7pt;
+    font-size: 7.5pt;
     text-align: center;
   }
 
@@ -243,7 +244,7 @@
 
   .cal-month-header {
     text-align: center;
-    font-size: 6.5pt;
+    font-size: 7pt;
     font-weight: 700;
     color: #ffffff;
     background: #3182ce;
@@ -271,16 +272,16 @@
   .cal-day-box:last-child { border-right: none; }
 
   .cal-day-weekday {
-    font-weight: 300;
+    font-weight: 400;
     color: #4a5568;
-    font-size: 4.5pt;
+    font-size: 5pt;
     line-height: 1;
   }
 
   .cal-day-num {
-    font-weight: 300;
+    font-weight: 400;
     color: #2b6cb0;
-    font-size: 5.5pt;
+    font-size: 6pt;
     line-height: 1;
   }
 
@@ -290,11 +291,13 @@
 
   .cal-day-box.has-leave { background-color: #fff5f5; }
 
+  /* 🌟 修正：細劃線 (0.5px) */
   .cal-doctor-leave {
     color: #e53e3e;
     text-decoration: line-through;
-    font-weight: 300;
-    font-size: 4.5pt;
+    text-decoration-thickness: 0.5px;
+    font-weight: 400;
+    font-size: 5pt;
     line-height: 1;
     white-space: nowrap;
     overflow: hidden;
@@ -309,15 +312,15 @@
     border-radius: 4px;
     background-color: #f0fff4;
     padding: 4px 6px;
-    font-size: 6.8pt;
-    line-height: 1.25;
+    font-size: 7.5pt;
+    line-height: 1.3;
     color: #1c4532;
   }
 
   .ai-summary-header {
     font-weight: 700;
     color: #276749;
-    font-size: 7.2pt;
+    font-size: 8pt;
     display: flex;
     align-items: center;
     gap: 4px;
@@ -334,12 +337,11 @@
     border-radius: 3px;
     margin-bottom: 4px;
     font-family: monospace;
-    font-size: 6pt;
+    font-size: 6.5pt;
     word-break: break-all;
   }
 
   @media print {
-    /* 加入這兩行：強制瀏覽器在列印時保留所有背景顏色與樣式 */
     * {
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;
@@ -378,7 +380,7 @@
 
   <!-- 頂部操作列 -->
   <div class="toolbar">
-    <div><strong style="color:#9c4221;">大學眼鏡桃園南崁 - 工作簡報</strong> <span style="font-size:7.5pt; color:#a0aec0; margin-left:6px;">Gemini 尋測生成版</span></div>
+    <div><strong style="color:#9c4221;">大學眼鏡桃園南崁 - 工作簡報</strong> <span style="font-size:8pt; color:#a0aec0; margin-left:6px;">Gemini 尋測生成版</span></div>
     <div>
       <button class="btn" onclick="loadAllSheets()">更新資料</button>
       <button class="btn" onclick="window.print()">列印 A4 日報</button>
@@ -611,7 +613,6 @@
     return fromStr || toStr || '-';
   }
 
-  // 🌟 日期 Key 正規化（自動把斜線 / 轉為橫槓 - 並補零）
   function toStandardDateKey(y, m, d) {
     return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
   }
@@ -862,7 +863,6 @@
     tbody.appendChild(tr);
   }
 
-  // 🌟 絕對配對機制：將所有 / 或 - 日期統一成 YYYY-MM-DD (橫槓+補零)
   function renderDoctorLeaveCalendar(rows) {
     const eventsMap = {};
 
@@ -873,7 +873,6 @@
         const dateText = parseCellText(r.c[0]);
         if (!dateText) return;
 
-        // 強制相容斜線與橫槓 (例如: 2026/08/31 或 2026-8-31)
         const match = dateText.match(/(\d{4})[/-](\d{1,2})[/-](\d{1,2})/);
         if (match) {
           const y = parseInt(match[1], 10);
@@ -906,7 +905,7 @@
   }
 
   function buildHorizontalRow(y, m, labelId, rowId, eventsMap) {
-    const displayMonth = m + 1; // 1 ~ 12
+    const displayMonth = m + 1;
     document.getElementById(labelId).innerText = `【 ${y} 年 ${displayMonth} 月 醫師請假/異動表 】`;
     const rowEl = document.getElementById(rowId);
     rowEl.innerHTML = '';
@@ -941,7 +940,6 @@
         box.classList.add('is-sunday');
       }
 
-      // 產出一模一樣格式的 Key 進行匹配: "2026-08-31"
       const fullKey = toStandardDateKey(y, displayMonth, d);
       const leaveList = eventsMap[fullKey] || [];
 
@@ -997,12 +995,11 @@
 3. 最後附上：「💡 店長提醒：[針對驗光專業、顧客服務或衛教給一句叮嚀]」
 4. 使用繁體中文，加上 HTML <strong> 標籤，字數 150 字以內，直接輸出 HTML。`;
 
+    // 正確的 Google AI 模型名稱
     const modelsToTry = [
-      'gemini-3.5-flash-lite',
-      'gemini-3.5-flash',
-      'gemini-3.6-flash',
-      'gemini-flash-lite-latest',
-      'gemini-flash-latest'
+      'gemini-2.0-flash',
+      'gemini-1.5-flash',
+      'gemini-1.5-flash-8b'
     ];
 
     for (const model of modelsToTry) {
@@ -1036,7 +1033,7 @@
     if (highTasks.length > 0) {
       fallbackText += `1. 今日重點工作共 <strong>${highTasks.length}</strong> 項，優先處理「${highTasks[0].content}」，請責任同仁於開診前確認完成。<br>`;
     } else {
-      fallbackText += `1. 今日各崗位工作正常推進，請同仁維持環境潔淨與驗光儀器每日校正。<br>`;
+      fallbackText += `1. 今日各崗位工作正常推進，請同仁維持環境潔淨與驗光儀器每日清潔校正。<br>`;
     }
 
     if (appointSummaryList.length > 0) {
@@ -1051,12 +1048,14 @@
       fallbackText += `3. 門診醫師全員出勤，請保持順暢的引導與驗光照護流程。<br>`;
     }
 
-    fallbackText += `<span style="color:#276749; font-weight:700;">💡 店長提醒：</span>請確實完成各項交接與物流確認，給顧客最專業的大學眼鏡品質，大家加油！`;
+    fallbackText += `<span style="color:#276749; font-weight:700;">💡 提醒夥伴：</span>請確實完成各項交接與物流確認，給顧客最專業的大學眼鏡品質，大家加油！`;
 
-    
+    // 發生錯誤或配額已滿時，安靜地輸出備用講稿
+    summaryEl.innerHTML = fallbackText;
   }
 
   window.onload = loadAllSheets;
 </script>
+<!-- 觸發重新部署 -->
 </body>
 </html>
