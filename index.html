@@ -206,6 +206,12 @@
     color: #4a5568;
   }
 
+  .time-tag {
+    color: #c05621;
+    font-weight: 600;
+    margin-left: 4px;
+  }
+
   .section-block.is-empty { opacity: 0.28 !important; }
 
   .center { text-align: center !important; }
@@ -291,7 +297,7 @@
 
   .cal-day-box.has-leave { background-color: #fff5f5; }
 
-  /* 🌟 修正：細劃線 (0.5px) */
+  /* 細劃線 (0.5px) */
   .cal-doctor-leave {
     color: #e53e3e;
     text-decoration: line-through;
@@ -323,22 +329,20 @@
     font-size: 8pt;
     display: flex;
     align-items: center;
-    gap: 4px;
+    justify-content: space-between;
     margin-bottom: 2px;
     border-bottom: 1px rgba(56, 161, 105, 0.25) solid;
     padding-bottom: 1px;
   }
 
-  .ai-error-box {
-    background-color: #fff5f5;
-    border: 1px solid #feb2b2;
-    color: #c53030;
-    padding: 4px;
-    border-radius: 3px;
-    margin-bottom: 4px;
-    font-family: monospace;
+  .ai-re-gen-btn {
     font-size: 6.5pt;
-    word-break: break-all;
+    color: #276749;
+    background: #c6f6d5;
+    border: 1px solid #38a169;
+    border-radius: 3px;
+    padding: 1px 4px;
+    cursor: pointer;
   }
 
   @media print {
@@ -352,7 +356,7 @@
       overflow: hidden;
       background-color: #ffffff;
     }
-    .toolbar, .full-page-mask { display: none !important; }
+    .toolbar, .full-page-mask, .ai-re-gen-btn { display: none !important; }
     .page-container {
       width: 100% !important;
       height: auto !important;
@@ -444,14 +448,13 @@
       <table class="data-table">
         <thead>
           <tr>
-            <th style="width: 10%;">項目分類</th>
-            <th style="width: 9%;">預約日期</th>
-            <th style="width: 53%;">交接事項 / 諮詢預約內容 (客戶與電話)</th>
-            <th style="width: 11%;">負責/交接</th>
-            <th style="width: 17%;">時間</th>
+            <th style="width: 12%;">項目分類</th>
+            <th style="width: 11%;">預約日期</th>
+            <th style="width: 63%;">交接事項 / 諮詢預約內容 (客戶與電話)</th>
+            <th style="width: 14%;">負責/交接</th>
           </tr>
         </thead>
-        <tbody id="tb-appoint-time"><tr><td colspan="5" class="center loading">載入中...</td></tr></tbody>
+        <tbody id="tb-appoint-time"><tr><td colspan="4" class="center loading">載入中...</td></tr></tbody>
       </table>
     </div>
 
@@ -483,7 +486,8 @@
     <!-- AI 智慧管理晨會卡片 -->
     <div class="ai-summary-card">
       <div class="ai-summary-header">
-        <span>🤖 Google Gemini AI 智慧晨會口述簡報與注意事項</span>
+        <span>晨會簡報與注意事項</span>
+        <button class="ai-re-gen-btn" onclick="generateAIContent(latestWorkItems, latestAppointSummaryList, latestLeaveRows, true)">重新生成 AI</button>
       </div>
       <div id="ai-summary-text">
         準備發送資料至 API...
@@ -506,6 +510,10 @@
     roster: '1032350585',
     leave: '700311219'
   };
+
+  let latestWorkItems = [];
+  let latestAppointSummaryList = [];
+  let latestLeaveRows = [];
 
   window.gvizCallbacks = {};
 
@@ -546,9 +554,12 @@
     });
   }
 
+  // 純文字解析 (完全不經 Date 換算)
   function parseCellText(cell) {
     if (!cell) return '';
-    if (cell.f) return cell.f.toString().trim();
+    if (cell.f !== null && cell.f !== undefined && cell.f !== '') {
+      return cell.f.toString().trim();
+    }
     if (cell.v !== null && cell.v !== undefined) {
       if (typeof cell.v === 'string' && cell.v.startsWith('Date(')) {
         const p = cell.v.match(/\d+/g);
@@ -558,7 +569,7 @@
           const d = String(p[2]).padStart(2, '0');
           const hh = p[3] ? String(p[3]).padStart(2, '0') : '00';
           const mm = p[4] ? String(p[4]).padStart(2, '0') : '00';
-          return `${y}-${m}-${d} ${hh}:${mm}`;
+          return `${y}/${m}/${d} ${hh}:${mm}`;
         }
       }
       return cell.v.toString().trim();
@@ -566,7 +577,18 @@
     return '';
   }
 
-  function formatSplitDateTimePlus8(cellData) {
+  // 提取時間純文字（如 "18:00"）
+  function extractTimeText(cellData) {
+    const rawStr = parseCellText(cellData);
+    if (!rawStr) return '';
+    const match = rawStr.match(/(\d{1,2}:\d{2})(?::\d{2})?/);
+    if (match) {
+      return match[1];
+    }
+    return rawStr;
+  }
+
+  function formatSplitDateTime(cellData) {
     const rawStr = parseCellText(cellData);
     if (!rawStr) return '-';
 
@@ -575,28 +597,16 @@
       return `<div class="time-split">${rawStr}</div>`;
     }
 
-    const y = parseInt(match[1], 10);
-    const m = parseInt(match[2], 10) - 1;
-    const d = parseInt(match[3], 10);
-    const hh = match[4] ? parseInt(match[4], 10) : 0;
-    const mm = match[5] ? parseInt(match[5], 10) : 0;
-    const ss = match[6] ? parseInt(match[6], 10) : 0;
+    const yStr = match[1];
+    const mStr = String(parseInt(match[2], 10)).padStart(2, '0');
+    const dStr = String(parseInt(match[3], 10)).padStart(2, '0');
+    const hhStr = match[4] ? String(parseInt(match[4], 10)).padStart(2, '0') : '';
+    const mmStr = match[5] ? String(parseInt(match[5], 10)).padStart(2, '0') : '';
 
-    const dateObj = new Date(Date.UTC(y, m, d, hh, mm, ss));
-    const twTime = new Date(dateObj.getTime() + (8 * 60 * 60 * 1000));
-    
-    const yStr = twTime.getUTCFullYear();
-    const mStr = String(twTime.getUTCMonth() + 1).padStart(2, '0');
-    const dStr = String(twTime.getUTCDate()).padStart(2, '0');
-    const hhStr = String(twTime.getUTCHours()).padStart(2, '0');
-    const mmStr = String(twTime.getUTCMinutes()).padStart(2, '0');
-
-    return `<div class="time-split">${yStr}-${mStr}-${dStr}<br>${hhStr}:${mmStr}</div>`;
-  }
-
-  function cleanTime(str) {
-    if (!str) return '';
-    return str.toString().replace(/(\d{1,2}:\d{2}):\d{2}/, '$1');
+    if (hhStr !== '') {
+      return `<div class="time-split">${yStr}/${mStr}/${dStr}<br>${hhStr}:${mmStr}</div>`;
+    }
+    return `<div class="time-split">${yStr}/${mStr}/${dStr}</div>`;
   }
 
   function getSecondChar(name) {
@@ -682,6 +692,8 @@
         fetchSheetData(GIDS.leave)
       ]);
 
+      latestLeaveRows = leaveRows;
+
       // 1. 工作規劃
       const workTbody = document.getElementById('tb-work');
       const blockWork = document.getElementById('block-work');
@@ -724,6 +736,7 @@
       }
 
       workItems.sort((a, b) => b.weight - a.weight);
+      latestWorkItems = workItems;
 
       if (workItems.length > 0) {
         workTbody.innerHTML = workItems.map(item => 
@@ -746,7 +759,7 @@
           const row = r.c.map(parseCellText);
           if (isToday(row[0]) || isToday(row[5]) || true) {
             const staffPair = formatStaffPair(row[3], row[4]);
-            trackingHtml += `<tr><td class="center nowrap" style="font-weight:700; color:#c05621;">[工作交接]</td><td class="center nowrap">${formatSplitDateTimePlus8(r.c[0])}</td><td class="center nowrap">${row[1]||''}</td><td>${row[2]||''}</td><td class="center nowrap font-small">${staffPair}</td></tr>`;
+            trackingHtml += `<tr><td class="center nowrap" style="font-weight:700; color:#c05621;">[工作交接]</td><td class="center nowrap">${formatSplitDateTime(r.c[0])}</td><td class="center nowrap">${row[1]||''}</td><td>${row[2]||''}</td><td class="center nowrap font-small">${staffPair}</td></tr>`;
           }
         });
       }
@@ -757,7 +770,7 @@
           const row = r.c.map(parseCellText);
           if (isToday(row[0]) || isToday(row[5]) || true) {
             const staffPair = formatStaffPair(row[3], row[4]);
-            trackingHtml += `<tr><td class="center nowrap" style="font-weight:700; color:#dd6b20;">[物流追蹤]</td><td class="center nowrap">${formatSplitDateTimePlus8(r.c[0])}</td><td class="center nowrap">${row[1]||''}</td><td>${row[2]||''}</td><td class="center nowrap font-small">${staffPair}</td></tr>`;
+            trackingHtml += `<tr><td class="center nowrap" style="font-weight:700; color:#dd6b20;">[物流追蹤]</td><td class="center nowrap">${formatSplitDateTime(r.c[0])}</td><td class="center nowrap">${row[1]||''}</td><td>${row[2]||''}</td><td class="center nowrap font-small">${staffPair}</td></tr>`;
           }
         });
       }
@@ -776,6 +789,7 @@
       let appointTimeHtml = '';
       let appointSummaryList = [];
 
+      // 🌟 [指定交接] 完全不顯示時間
       if (timeHandoverRows.length > 1) {
         timeHandoverRows.slice(1).forEach(r => {
           if (!r || !r.c) return;
@@ -785,11 +799,14 @@
             const dateTag = isTm ? '<span style="color:#e53e3e; font-weight:700;">[明日]</span>' : '<span style="color:#c05621; font-weight:700;">[今日]</span>';
             const handoverPeople = formatStaffPair(row[3], row[4]);
             
-            appointTimeHtml += `<tr><td class="center nowrap" style="font-weight:700; color:#c05621;">[指定交接]</td><td class="center nowrap">${dateTag}</td><td>${row[2]||''}</td><td class="center nowrap font-small">${handoverPeople}</td><td class="center nowrap">${formatSplitDateTimePlus8(r.c[0])}</td></tr>`;
+            const fullContent = row[2] || '';
+
+            appointTimeHtml += `<tr><td class="center nowrap" style="font-weight:700; color:#c05621;">[指定交接]</td><td class="center nowrap">${dateTag}</td><td>${fullContent}</td><td class="center nowrap font-small">${handoverPeople}</td></tr>`;
           }
         });
       }
 
+      // 🌟 [諮詢預約] 顯示時間
       if (appointRows.length > 1) {
         appointRows.slice(1).forEach(r => {
           if (!r || !r.c) return;
@@ -800,20 +817,29 @@
             const clientName = row[1] || '';
             const phone = row[4] ? ` (${row[4]})` : '';
             const eventContent = row[2] || '';
-            const fullContent = clientName ? `<strong>${clientName}</strong>：${eventContent}${phone}` : `${eventContent}${phone}`;
+            
+            // 直接抓取時間欄位的文字 (優先取第 6 欄，若無取第 1 欄)
+            const rawTime = extractTimeText(r.c[5] || r.c[0]);
+            const timeTag = rawTime ? ` <span class="time-tag">(${rawTime})</span>` : '';
+
+            const fullContent = clientName 
+              ? `<strong>${clientName}</strong>：${eventContent}${phone}${timeTag}` 
+              : `${eventContent}${phone}${timeTag}`;
             
             if (!isTm) appointSummaryList.push(`${clientName}(${eventContent})`);
 
-            appointTimeHtml += `<tr><td class="center nowrap" style="font-weight:700; color:#dd6b20;">[諮詢預約]</td><td class="center nowrap">${dateTag}</td><td>${fullContent}</td><td class="center nowrap font-small">${row[3]||''}</td><td class="center nowrap">${formatSplitDateTimePlus8(r.c[5] || r.c[0])}</td></tr>`;
+            appointTimeHtml += `<tr><td class="center nowrap" style="font-weight:700; color:#dd6b20;">[諮詢預約]</td><td class="center nowrap">${dateTag}</td><td>${fullContent}</td><td class="center nowrap font-small">${row[3]||''}</td></tr>`;
           }
         });
       }
+
+      latestAppointSummaryList = appointSummaryList;
 
       if (appointTimeHtml) {
         appointTimeTbody.innerHTML = appointTimeHtml;
         blockAppointTime.classList.remove('is-empty');
       } else {
-        appointTimeTbody.innerHTML = '<tr><td colspan="5" class="center" style="color:#a0aec0;">今日與明日無預約事項</td></tr>';
+        appointTimeTbody.innerHTML = '<tr><td colspan="4" class="center" style="color:#a0aec0;">今日與明日無預約事項</td></tr>';
         blockAppointTime.classList.add('is-empty');
       }
 
@@ -821,7 +847,7 @@
       renderTodayRoster(rosterRows);
       renderDoctorLeaveCalendar(leaveRows);
 
-      // AI 講稿生成
+      // AI 講稿生成 (帶入快取機制)
       await generateAIContent(workItems, appointSummaryList, leaveRows);
 
     } catch (err) {
@@ -964,10 +990,18 @@
     }
   }
 
-  // AI 智慧晨會生成函式
-  async function generateAIContent(workItems, appointSummaryList, leaveRows) {
+  async function generateAIContent(workItems, appointSummaryList, leaveRows, forceRefresh = false) {
     const summaryEl = document.getElementById('ai-summary-text');
-    let errorDetails = "";
+    const cacheKeyDate = 'ai_speech_date';
+    const cacheKeyText = 'ai_speech_text';
+
+    const cachedDate = localStorage.getItem(cacheKeyDate);
+    const cachedText = localStorage.getItem(cacheKeyText);
+
+    if (!forceRefresh && cachedDate === todayStr && cachedText) {
+      summaryEl.innerHTML = cachedText + ` <span style="font-size:6.5pt; color:#a0aec0; margin-left:4px;">(讀取當日快取)</span>`;
+      return;
+    }
 
     let leaveDocs = [];
     if (leaveRows && leaveRows.length > 0) {
@@ -995,7 +1029,6 @@
 3. 最後附上：「💡 店長提醒：[針對驗光專業、顧客服務或衛教給一句叮嚀]」
 4. 使用繁體中文，加上 HTML <strong> 標籤，字數 150 字以內，直接輸出 HTML。`;
 
-    // 正確的 Google AI 模型名稱
     const modelsToTry = [
       'gemini-2.0-flash',
       'gemini-1.5-flash',
@@ -1016,17 +1049,19 @@
         
         if (response.ok && data.candidates && data.candidates[0].content) {
           let aiResult = data.candidates[0].content.parts[0].text;
-          summaryEl.innerHTML = aiResult.replace(/```html/g, '').replace(/```/g, '').trim();
+          const cleanHtml = aiResult.replace(/```html/g, '').replace(/```/g, '').trim();
+          
+          summaryEl.innerHTML = cleanHtml;
+
+          localStorage.setItem(cacheKeyDate, todayStr);
+          localStorage.setItem(cacheKeyText, cleanHtml);
           return;
-        } else {
-          errorDetails += `[${model}] 錯誤: ${data.error ? data.error.message : 'Unknown'}<br>`;
         }
       } catch (e) {
-        errorDetails += `[${model}] 連線失敗<br>`;
+        console.error(`[${model}] 連線失敗`, e);
       }
     }
 
-    // 備用講稿
     let fallbackText = `<strong>各位同仁大家早安，以下為今日大學眼鏡南崁店晨會重點：</strong><br>`;
     const highTasks = workItems.filter(i => i.weight === 3);
     
@@ -1050,12 +1085,10 @@
 
     fallbackText += `<span style="color:#276749; font-weight:700;">💡 提醒夥伴：</span>請確實完成各項交接與物流確認，給顧客最專業的大學眼鏡品質，大家加油！`;
 
-    // 發生錯誤或配額已滿時，安靜地輸出備用講稿
     summaryEl.innerHTML = fallbackText;
   }
 
   window.onload = loadAllSheets;
 </script>
-<!-- 觸發重新部署 -->
 </body>
 </html>
