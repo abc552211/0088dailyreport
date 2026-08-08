@@ -18,21 +18,21 @@
   body {
     font-family: "PingFang TC", "Microsoft JhengHei", "Noto Sans CJK TC", sans-serif;
     font-size: 8.5pt;
-    line-height: 1.2;
+    line-height: 1.25;
     color: #2d3748;
     margin: 0;
     padding: 0;
-    background-color: #fffaf5;
+    background-color: #f7fafc;
   }
 
-  /* 全頁式 AI 分析遮罩 (極簡正圓眼鏡) */
+  /* 全頁式 AI 分析遮罩 */
   .full-page-mask {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(255, 250, 245, 0.96);
+    background: rgba(255, 255, 255, 0.96);
     backdrop-filter: blur(5px);
     display: flex;
     flex-direction: column;
@@ -53,7 +53,7 @@
   .minimal-glasses-lens {
     width: 28px;
     height: 28px;
-    border: 3px solid #dd6b20;
+    border: 3px solid #3182ce;
     border-radius: 50%;
     box-sizing: border-box;
   }
@@ -61,7 +61,7 @@
   .minimal-glasses-bridge {
     width: 8px;
     height: 3px;
-    background-color: #dd6b20;
+    background-color: #3182ce;
     margin: 0 -1px;
   }
 
@@ -73,14 +73,14 @@
   .mask-text {
     font-size: 13pt;
     font-weight: 700;
-    color: #9c4221;
+    color: #2b6cb0;
     letter-spacing: 1.5px;
     margin-bottom: 6px;
   }
 
   .mask-subtext {
     font-size: 9pt;
-    color: #c05621;
+    color: #4299e1;
     font-weight: 600;
   }
 
@@ -91,77 +91,57 @@
     padding: 4px 12px;
     background: #ffffff;
     border-radius: 6px;
-    box-shadow: 0 2px 8px rgba(194, 120, 3, 0.12);
+    box-shadow: 0 2px 8px rgba(49, 130, 206, 0.12);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border: 1px solid #fbd38d;
+    border: 1px solid #90cdf4;
   }
 
   .btn {
-    background: linear-gradient(135deg, #dd6b20 0%, #c05621 100%);
+    background: #3182ce;
     color: white;
     border: none;
     padding: 4px 12px;
-    border-radius: 12px;
+    border-radius: 4px;
     cursor: pointer;
     font-size: 8pt;
     font-weight: 600;
   }
 
-  .btn:hover { opacity: 0.95; }
+  .btn:hover { background: #2b6cb0; }
 
   /* A4 卡片容器 */
   .page-container {
     width: 210mm;
-    padding: 4mm 6mm;
+    padding: 5mm 7mm;
     margin: 0 auto;
     background: #ffffff;
-    box-shadow: 0 4px 15px rgba(194, 120, 3, 0.08);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+    border: 1.5px solid #cbd5e0;
   }
 
-  /* 頁首標頭 */
-  .header-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 3px;
-    border-bottom: 2px solid #dd6b20;
-    padding-bottom: 2px;
+  /* 頂部 Header 區域 */
+  .header-box {
+    background-color: #e2e8f0;
+    text-align: center;
+    padding: 4px;
+    margin-bottom: 4px;
+    border: 1px solid #a0aec0;
   }
 
-  .header-title {
+  .header-title-date {
     font-size: 13pt;
     font-weight: 800;
-    color: #9c4221;
+    color: #1a202c;
     letter-spacing: 0.5px;
   }
 
-  .meta-box {
-    border: 1px solid #fbd38d;
-    border-radius: 4px;
-    padding: 2px 6px;
-    background-color: #fffaf0;
-    font-size: 8pt;
-  }
-
-  /* 區塊標題 */
-  .section-block {
-    margin-top: 3px;
-    margin-bottom: 2px;
-  }
-
-  .section-title {
-    font-size: 8.5pt;
+  .header-subtitle {
+    font-size: 11pt;
     font-weight: 700;
-    padding: 2px 5px;
-    border-radius: 0 3px 3px 0;
-    margin-bottom: 1.5px;
-  }
-
-  .theme-amber .section-title {
-    color: #7b341e;
-    background: #feebc8;
-    border-left: 3px solid #dd6b20;
+    color: #4a5568;
+    margin-top: 1px;
   }
 
   /* 表格基礎樣式 */
@@ -173,176 +153,202 @@
 
   table.data-table th, 
   table.data-table td {
-    border: 1px solid #feebc8;
-    padding: 2.5px 4px;
+    border: 1px solid #a0aec0;
+    padding: 3.5px 5px;
     text-align: left;
     word-wrap: break-word;
     overflow-wrap: break-word;
     vertical-align: middle;
-    font-size: 8pt;
+    font-size: 8.8pt;
   }
 
-  .theme-amber table.data-table th {
-    background-color: #dd6b20;
-    color: #ffffff;
+  table.data-table th {
+    background-color: #cbd5e0;
+    color: #1a202c;
     font-weight: 700;
-    font-size: 7.5pt;
+    font-size: 8.8pt;
     text-align: center;
-    white-space: nowrap;
   }
-
-  .nowrap {
-    white-space: nowrap !important;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .font-small { font-size: 7pt !important; }
-  
-  /* 時間雙列微縮排版 */
-  .time-split {
-    font-size: 6.5pt !important;
-    line-height: 1.05;
-    color: #4a5568;
-  }
-
-  .time-tag {
-    color: #c05621;
-    font-weight: 600;
-    margin-left: 4px;
-  }
-
-  .section-block.is-empty { opacity: 0.28 !important; }
 
   .center { text-align: center !important; }
   .loading { color: #a0aec0; font-style: italic; padding: 2px !important; }
 
-  /* 配色：班表與醫師請假行事曆 (天晴藍調) */
-  .theme-blue .section-title {
-    color: #1a365d;
-    background: #ebf8ff;
-    border-left: 3px solid #3182ce;
+  /* 上半區：Today's schedule */
+  .section-today {
+    margin-bottom: 4px;
   }
 
-  .theme-blue table.data-table th {
-    background-color: #3182ce;
-    color: #ffffff;
-    font-weight: 700;
-    font-size: 7.5pt;
-    text-align: center;
-  }
-
-  .theme-blue table.data-table td { border-color: #bee3f8; }
-
-  .horizontal-cal-container {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    margin-top: 2px;
-  }
-
-  .cal-block {
-    border: 1px solid #bee3f8;
+  /* 內容彩色標籤 */
+  .badge {
+    display: inline-block;
+    padding: 0.5px 4px;
     border-radius: 3px;
-    background: #ffffff;
-    padding: 1px;
-  }
-
-  .cal-month-header {
-    text-align: center;
-    font-size: 7pt;
+    font-size: 7.5pt;
     font-weight: 700;
-    color: #ffffff;
-    background: #3182ce;
-    padding: 1px 0;
-    border-radius: 2px;
-    margin-bottom: 1px;
+    margin-right: 3px;
   }
 
-  .cal-days-flex { display: flex; width: 100%; }
+  .badge-high { background-color: #fed7d7; color: #9b2c2c; border: 1px solid #feb2b2; }
+  .badge-medium { background-color: #feebc8; color: #7b341e; border: 1px solid #fbd38d; }
+  .badge-time { background-color: #ebf8ff; color: #2c5282; border: 1px solid #bee3f8; }
+  .badge-track { background-color: #e6fffa; color: #234e52; border: 1px solid #b2f5ea; }
+  .badge-appoint { background-color: #faf5ff; color: #553c9a; border: 1px solid #e9d8fd; }
 
-  .cal-day-box {
-    flex: 1;
-    border-right: 1px solid #ebf8ff;
-    padding: 0.5px 0;
+  /* 下半區：左右 2 大欄配置 */
+  .bottom-layout {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    margin-bottom: 4px;
+  }
+
+  .bottom-col {
+    display: table-cell;
+    vertical-align: top;
+    border: 1px solid #a0aec0;
+  }
+
+  .bottom-col-title {
+    background-color: #cbd5e0;
+    color: #1a202c;
+    font-weight: 700;
+    font-size: 8pt;
     text-align: center;
-    min-height: 20px;
-    height: auto;
+    padding: 2px 4px;
+    border-bottom: 1px solid #a0aec0;
+  }
+
+  .bottom-col-content {
+    padding: 3px 5px;
+    font-size: 7.5pt;
+  }
+
+  /* 醫師名單按人歸類卡片 */
+  .doc-card {
+    background: #f8fafc;
+    border: 1px solid #cbd5e0;
+    border-radius: 4px;
+    padding: 3px 5px;
+    margin-bottom: 3px;
+  }
+
+  .doc-name-title {
+    font-size: 7.5pt;
+    font-weight: 800;
+    color: #2b6cb0;
+    border-bottom: 1px dashed #cbd5e0;
+    padding-bottom: 1px;
+    margin-bottom: 2px;
+  }
+
+  .doc-dates-text {
+    font-size: 6.8pt;
+    color: #4a5568;
+    line-height: 1.25;
+    word-break: break-all;
+  }
+
+  /* 班表人員：放在左欄下方獨立單列 */
+  .staff-roster-bar {
+    border-top: 1px solid #a0aec0;
+    background-color: #edf2f7;
+    padding: 3px 6px;
+    font-size: 7.5pt;
+    line-height: 1.2;
+    color: #2d3748;
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    overflow: hidden;
+  }
+
+  .staff-title {
+    font-weight: 800;
+    color: #2b6cb0;
+    margin-right: 6px;
+    white-space: nowrap;
+  }
+
+  .staff-inline-item {
+    margin-right: 10px;
+    white-space: nowrap;
+  }
+
+  .staff-inline-item strong {
+    color: #1a202c;
+  }
+
+  /* 底部 本日重點 (管理職數據儀表板視角) */
+  .ai-footer-box {
+    display: flex;
+    align-items: stretch;
+    background-color: #f8fafc;
+    border: 1px solid #a0aec0;
+    padding: 4px;
+    margin-top: 4px;
+    box-sizing: border-box;
+  }
+
+  .ai-footer-label {
+    flex-shrink: 0;
+    width: 85px;
+    font-size: 9pt;
+    font-weight: 800;
+    color: #2b6cb0;
+    border-right: 2px dashed #cbd5e0;
+    padding-right: 6px;
+    margin-right: 6px;
     display: flex;
     flex-direction: column;
+    justify-content: center;
     align-items: center;
-    justify-content: flex-start;
-    overflow: hidden;
+    text-align: center;
   }
 
-  .cal-day-box:last-child { border-right: none; }
-
-  .cal-day-weekday {
-    font-weight: 400;
-    color: #4a5568;
-    font-size: 5pt;
-    line-height: 1;
-  }
-
-  .cal-day-num {
-    font-weight: 400;
-    color: #2b6cb0;
-    font-size: 6pt;
-    line-height: 1;
-  }
-
-  .cal-day-box.is-sunday { background-color: #feebc8; }
-  .cal-day-box.is-sunday .cal-day-weekday,
-  .cal-day-box.is-sunday .cal-day-num { color: #c05621; font-weight: 600; }
-
-  .cal-day-box.has-leave { background-color: #fff5f5; }
-
-  /* 細劃線 (0.5px) */
-  .cal-doctor-leave {
-    color: #e53e3e;
-    text-decoration: line-through;
-    text-decoration-thickness: 0.5px;
-    font-weight: 400;
-    font-size: 5pt;
-    line-height: 1;
-    white-space: nowrap;
-    overflow: hidden;
-    margin-top: 0.5px;
-    letter-spacing: -0.2px;
-  }
-
-  /* AI 智慧管理晨會卡片 */
-  .ai-summary-card {
-    margin-top: 3px;
-    border: 1px dashed #38a169;
-    border-radius: 4px;
-    background-color: #f0fff4;
-    padding: 4px 6px;
-    font-size: 7.5pt;
-    line-height: 1.3;
-    color: #1c4532;
-  }
-
-  .ai-summary-header {
-    font-weight: 700;
-    color: #276749;
-    font-size: 8pt;
+  .ai-footer-text {
+    flex-grow: 1;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 2px;
-    border-bottom: 1px rgba(56, 161, 105, 0.25) solid;
-    padding-bottom: 1px;
+    gap: 5px;
+    flex-wrap: nowrap;
   }
 
   .ai-re-gen-btn {
     font-size: 6.5pt;
-    color: #276749;
-    background: #c6f6d5;
-    border: 1px solid #38a169;
+    color: #2d3748;
+    background: #ffffff;
+    border: 1px solid #cbd5e0;
     border-radius: 3px;
-    padding: 1px 4px;
+    padding: 2px 6px;
     cursor: pointer;
+    margin-top: 4px;
+    font-weight: 600;
+  }
+
+  /* 儀表板數據卡片 UI */
+  .dash-card {
+    flex: 1;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    padding: 3px 6px;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .dash-card-title {
+    font-size: 6.5pt;
+    font-weight: 700;
+    color: #718096;
+    margin-bottom: 2px;
+  }
+
+  .dash-card-value {
+    font-size: 7.5pt;
+    font-weight: 700;
+    color: #1a202c;
+    line-height: 1.25;
   }
 
   @media print {
@@ -371,7 +377,7 @@
 </head>
 <body>
 
-  <!-- 全頁式 AI 分析遮罩 (正圓無縫眼鏡) -->
+  <!-- 全頁式 AI 分析遮罩 -->
   <div class="full-page-mask" id="full-page-mask">
     <div class="minimal-glasses">
       <div class="minimal-glasses-lens"></div>
@@ -379,12 +385,12 @@
       <div class="minimal-glasses-lens"></div>
     </div>
     <div class="mask-text">[ AI 正在分析今日工作 ... ]</div>
-    <div class="mask-subtext">請稍候，大學眼鏡桃園南崁店 晨會簡報即時生成中</div>
+    <div class="mask-subtext">請稍候，大學眼鏡桃園南崁店 工作簡報即時生成中</div>
   </div>
 
   <!-- 頂部操作列 -->
   <div class="toolbar">
-    <div><strong style="color:#9c4221;">大學眼鏡桃園南崁 - 工作簡報</strong> <span style="font-size:8pt; color:#a0aec0; margin-left:6px;">Gemini 尋測生成版</span></div>
+    <div><strong style="color:#1a202c;">大學眼鏡桃園南崁 - 工作簡報</strong> <span style="font-size:8pt; color:#718096; margin-left:6px;">簡報手帳版</span></div>
     <div>
       <button class="btn" onclick="loadAllSheets()">更新資料</button>
       <button class="btn" onclick="window.print()">列印 A4 日報</button>
@@ -393,111 +399,70 @@
 
   <div class="page-container">
 
-    <!-- 頁首標頭 -->
-    <table class="header-table">
-      <tr>
-        <td style="width: 60%; vertical-align: bottom;">
-          <div class="header-title">大學眼鏡桃園南崁 - 工作簡報</div>
-        </td>
-        <td style="width: 40%; text-align: right;">
-          <div class="meta-box" style="display: inline-block;">
-            <span style="font-weight:700; color:#dd6b20;">填表日期：</span>
-            <span id="today-date">2026/08/06</span>
+    <!-- 頂部標頭 -->
+    <div class="header-box">
+      <div class="header-title-date" id="header-date-title">Aug 06, 26 (Thu)</div>
+      <div class="header-subtitle">-Kids' daily log - Nankan-</div>
+    </div>
+
+    <!-- 上半區：Today's schedule -->
+    <div class="section-today">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width: 12%;">Assigned to</th>
+            <th style="width: 88%;">Today's schedule</th>
+          </tr>
+        </thead>
+        <tbody id="tb-todays-schedule">
+          <tr><td colspan="2" class="center loading">載入中...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 下半區：左右 2 大欄配置 -->
+    <div class="bottom-layout">
+      <!-- 欄位 1: Next Workday's schedule + 【今日上班人員】底欄 (左 68%) -->
+      <div class="bottom-col" style="width: 68%;">
+        <div class="bottom-col-title" id="title-next-workday">Next Workday's schedule</div>
+        <div class="bottom-col-content" id="col-tomorrows-schedule" style="min-height: 90px;">
+          <div class="loading center">載入中...</div>
+        </div>
+
+        <!-- 【今日上班人員】簡約單列 -->
+        <div class="staff-roster-bar" id="col-staff-roster">
+          <!-- 動態填入班表人員 -->
+        </div>
+      </div>
+
+      <!-- 欄位 2: Doctor's notice (右 32%) -->
+      <div class="bottom-col" style="width: 32%; border-left: none;">
+        <div class="bottom-col-title">Doctor's notice</div>
+        <div class="bottom-col-content" style="padding: 3px;">
+          <div id="col-doctor-notice">
+            <div class="loading center">載入中...</div>
           </div>
-        </td>
-      </tr>
-    </table>
-
-    <!-- 1. 工作規劃 -->
-    <div class="section-block theme-amber" id="block-work">
-      <div class="section-title">1. 工作規劃 (周工作：<span id="txt-weekday">今日</span> / 日工作：<span id="txt-monthdate">今日號碼</span>)</div>
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th style="width: 10%;">類型</th>
-            <th style="width: 11%;">週期數值</th>
-            <th style="width: 59%;">工作內容</th>
-            <th style="width: 10%;">重要程度</th>
-            <th style="width: 10%;">執行狀態</th>
-          </tr>
-        </thead>
-        <tbody id="tb-work"><tr><td colspan="5" class="center loading">載入中...</td></tr></tbody>
-      </table>
-    </div>
-
-    <!-- 2. 追蹤事項 -->
-    <div class="section-block theme-amber" id="block-tracking">
-      <div class="section-title">2. 追蹤事項 (工作交接與物流)</div>
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th style="width: 10%;">分類</th>
-            <th style="width: 14%;">建立時間</th>
-            <th style="width: 10%;">類型</th>
-            <th style="width: 53%;">追蹤內容</th>
-            <th style="width: 13%;">經手人</th>
-          </tr>
-        </thead>
-        <tbody id="tb-tracking"><tr><td colspan="5" class="center loading">載入中...</td></tr></tbody>
-      </table>
-    </div>
-
-    <!-- 3. 預約與指定時間交接 -->
-    <div class="section-block theme-amber" id="block-appoint-time">
-      <div class="section-title">3. 預約與指定時間交接 (今日與明日)</div>
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th style="width: 12%;">項目分類</th>
-            <th style="width: 11%;">預約日期</th>
-            <th style="width: 63%;">交接事項 / 諮詢預約內容 (客戶與電話)</th>
-            <th style="width: 14%;">負責/交接</th>
-          </tr>
-        </thead>
-        <tbody id="tb-appoint-time"><tr><td colspan="4" class="center loading">載入中...</td></tr></tbody>
-      </table>
-    </div>
-
-    <!-- 4. 出勤班表與醫師請假行事曆 -->
-    <div class="section-block theme-blue" id="block-roster-leave">
-      <div class="section-title">4. 出勤班表與醫師請假行事曆</div>
-      <table class="data-table" style="margin-bottom: 2px;">
-        <thead>
-          <tr>
-            <th style="width: 14%;">排班日期</th>
-            <th style="width: 86%;">當日出勤與班別人員</th>
-          </tr>
-        </thead>
-        <tbody id="tb-roster"><tr><td colspan="2" class="center loading">載入中...</td></tr></tbody>
-      </table>
-
-      <div class="horizontal-cal-container">
-        <div class="cal-block">
-          <div class="cal-month-header" id="lbl-curr-month">當月</div>
-          <div class="cal-days-flex" id="row-curr-month"></div>
-        </div>
-        <div class="cal-block">
-          <div class="cal-month-header" id="lbl-next-month">次月</div>
-          <div class="cal-days-flex" id="row-next-month"></div>
         </div>
       </div>
     </div>
 
-    <!-- AI 智慧管理晨會卡片 -->
-    <div class="ai-summary-card">
-      <div class="ai-summary-header">
-        <span>晨會簡報與注意事項</span>
-        <button class="ai-re-gen-btn" onclick="generateAIContent(latestWorkItems, latestAppointSummaryList, latestLeaveRows, true)">重新生成 AI</button>
+    <!-- 頁尾 本日重點 (管理職視角) -->
+    <div class="ai-footer-box">
+      <div class="ai-footer-label">
+        🎯 本日重點
+        <br>
+        <button class="ai-re-gen-btn" onclick="generateLocalSummary(latestWorkItems, latestAppointSummaryList, latestLeaveRows)">更新數據</button>
       </div>
-      <div id="ai-summary-text">
-        準備發送資料至 API...
+      <div class="ai-footer-text" id="ai-summary-text">
+        數據彙整中...
       </div>
     </div>
 
   </div>
 
 <script>
-  const GEMINI_API_KEY = 'AQ.Ab8RN6LjuQE4Y01bASVnabfKlNFWkksmaHaAnPZjhyvsML-J5A';
+  // 🔑 API Key
+  const GEMINI_API_KEY = 'AIzaSyB3cPMa60muqqeGtmNjArLS6fWvxil7Juc';
 
   const SHEET_ID = '1ypmvlBQ6HvIYLRQbKX2q3gosZtJCff3bCfrdX6sJ8YI';
   const GIDS = {
@@ -554,7 +519,6 @@
     });
   }
 
-  // 純文字解析 (完全不經 Date 換算)
   function parseCellText(cell) {
     if (!cell) return '';
     if (cell.f !== null && cell.f !== undefined && cell.f !== '') {
@@ -567,9 +531,7 @@
           const y = p[0];
           const m = String(parseInt(p[1], 10) + 1).padStart(2, '0');
           const d = String(p[2]).padStart(2, '0');
-          const hh = p[3] ? String(p[3]).padStart(2, '0') : '00';
-          const mm = p[4] ? String(p[4]).padStart(2, '0') : '00';
-          return `${y}/${m}/${d} ${hh}:${mm}`;
+          return `${y}/${m}/${d}`;
         }
       }
       return cell.v.toString().trim();
@@ -577,54 +539,24 @@
     return '';
   }
 
-  // 提取時間純文字（如 "18:00"）
   function extractTimeText(cellData) {
     const rawStr = parseCellText(cellData);
     if (!rawStr) return '';
     const match = rawStr.match(/(\d{1,2}:\d{2})(?::\d{2})?/);
-    if (match) {
-      return match[1];
-    }
+    if (match) return match[1];
     return rawStr;
   }
 
-  function formatSplitDateTime(cellData) {
-    const rawStr = parseCellText(cellData);
-    if (!rawStr) return '-';
-
-    const match = rawStr.match(/(\d{4})[/-](\d{1,2})[/-](\d{1,2})(?:\s+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?/);
-    if (!match) {
-      return `<div class="time-split">${rawStr}</div>`;
-    }
-
-    const yStr = match[1];
-    const mStr = String(parseInt(match[2], 10)).padStart(2, '0');
-    const dStr = String(parseInt(match[3], 10)).padStart(2, '0');
-    const hhStr = match[4] ? String(parseInt(match[4], 10)).padStart(2, '0') : '';
-    const mmStr = match[5] ? String(parseInt(match[5], 10)).padStart(2, '0') : '';
-
-    if (hhStr !== '') {
-      return `<div class="time-split">${yStr}/${mStr}/${dStr}<br>${hhStr}:${mmStr}</div>`;
-    }
-    return `<div class="time-split">${yStr}/${mStr}/${dStr}</div>`;
-  }
-
-  function getSecondChar(name) {
-    if (!name) return '';
-    const clean = name.toString().trim();
-    if (clean.length < 2) return clean;
-    return clean.charAt(1);
-  }
-
-  function formatStaffPair(fromStaff, toStaff) {
-    const fromStr = (fromStaff || '').toString().trim();
-    const toStr = (toStaff || '').toString().trim();
-    if (fromStr && toStr && fromStr !== toStr) return `${fromStr}→${toStr}`;
-    return fromStr || toStr || '-';
-  }
-
-  function toStandardDateKey(y, m, d) {
-    return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+  function checkDateMatch(targetDateObj, cellStr) {
+    if (!cellStr) return false;
+    const cleanStr = cellStr.toString().replace(/-/g, '/');
+    const y = targetDateObj.getFullYear();
+    const m = targetDateObj.getMonth() + 1;
+    const d = targetDateObj.getDate();
+    
+    const fullStr = `${y}/${String(m).padStart(2, '0')}/${String(d).padStart(2, '0')}`;
+    const shortStr = `${m}/${d}`;
+    return cleanStr.includes(fullStr) || cleanStr.includes(shortStr);
   }
 
   const todayObj = new Date();
@@ -633,45 +565,54 @@
   const dateNum = todayObj.getDate();
   const dateNumStr = String(dateNum).padStart(2, '0');
   
-  const weekdays = ['週日', '週一', '週二', '週三', '週四', '週五', '週六'];
-  const shortWeekdays = ['日', '一', '二', '三', '四', '五', '六'];
-  const weekdayStr = weekdays[todayObj.getDay()];
-  const shortWeekdayStr = shortWeekdays[todayObj.getDay()];
+  const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const zhWeekdaysShort = ['日', '一', '二', '三', '四', '五', '六'];
 
-  document.getElementById('today-date').innerText = `${year}/${String(month + 1).padStart(2, '0')}/${dateNumStr} (${weekdayStr})`;
-  document.getElementById('txt-weekday').innerText = weekdayStr;
-  document.getElementById('txt-monthdate').innerText = `${dateNum}號`;
+  const weekdayStr = weekdays[todayObj.getDay()];
+  const monthStr = months[month];
+  const yearShort = String(year).slice(-2);
+
+  document.getElementById('header-date-title').innerText = `${monthStr} ${dateNumStr}, ${yearShort} (${weekdayStr})`;
 
   const todayStr = `${year}/${String(month + 1).padStart(2, '0')}/${dateNumStr}`;
-  const todayShortStr = `${month + 1}/${dateNum}`;
-
-  const tomorrowObj = new Date(todayObj);
-  tomorrowObj.setDate(dateNum + 1);
-  const tmYear = tomorrowObj.getFullYear();
-  const tmMonth = tomorrowObj.getMonth();
-  const tmDateNum = tomorrowObj.getDate();
-  const tomorrowStr = `${tmYear}/${String(tmMonth + 1).padStart(2, '0')}/${String(tmDateNum).padStart(2, '0')}`;
-  const tomorrowShortStr = `${tmMonth + 1}/${tmDateNum}`;
 
   function isToday(str) {
-    if (!str) return false;
-    const cleanStr = str.toString().replace(/-/g, '/');
-    return cleanStr.includes(todayStr) || cleanStr.includes(todayShortStr);
+    return checkDateMatch(todayObj, str);
   }
 
-  function isTomorrow(str) {
-    if (!str) return false;
-    const cleanStr = str.toString().replace(/-/g, '/');
-    return cleanStr.includes(tomorrowStr) || cleanStr.includes(tomorrowShortStr);
-  }
-
-  function getPriorityWeight(priority) {
-    if (!priority) return 0;
+  function getPriorityBadge(priority) {
+    if (!priority) return '<span class="badge badge-medium">[中]</span>';
     const p = priority.toString().trim();
-    if (p.includes('高') || p.toUpperCase() === 'HIGH' || p === '3') return 3;
-    if (p.includes('中') || p.toUpperCase() === 'MEDIUM' || p === '2') return 2;
-    if (p.includes('低') || p.toUpperCase() === 'LOW' || p === '1') return 1;
-    return 0;
+    if (p.includes('高') || p.toUpperCase() === 'HIGH' || p === '3') return '<span class="badge badge-high">[高]</span>';
+    if (p.includes('低') || p.toUpperCase() === 'LOW' || p === '1') return '<span class="badge badge-medium">[低]</span>';
+    return '<span class="badge badge-medium">[中]</span>';
+  }
+
+  /* 🔍 動態尋找下一個有排班的營業日 */
+  function findNextWorkday(rosterRows) {
+    for (let offset = 1; offset <= 30; offset++) {
+      const checkObj = new Date(todayObj);
+      checkObj.setDate(todayObj.getDate() + offset);
+
+      let hasStaff = false;
+      if (rosterRows && rosterRows.length > 1) {
+        rosterRows.slice(1).forEach(r => {
+          if (!r || !r.c) return;
+          const rowData = r.c.map(parseCellText);
+          if (checkDateMatch(checkObj, rowData[0])) {
+            const staffNames = (rowData[1] || '').trim();
+            if (staffNames !== '') hasStaff = true;
+          }
+        });
+      }
+
+      if (hasStaff) return checkObj;
+    }
+
+    const defaultTm = new Date(todayObj);
+    defaultTm.setDate(todayObj.getDate() + 1);
+    return defaultTm;
   }
 
   async function loadAllSheets() {
@@ -694,24 +635,22 @@
 
       latestLeaveRows = leaveRows;
 
-      // 1. 工作規劃
-      const workTbody = document.getElementById('tb-work');
-      const blockWork = document.getElementById('block-work');
-      let workItems = [];
+      let todayScheduleList = [];
+
+      const zhWeekdays = ['週日', '週一', '週二', '週三', '週四', '週五', '週六'];
+      const zhShortWeekdays = ['日', '一', '二', '三', '四', '五', '六'];
+      const targetZhWeek = zhWeekdays[todayObj.getDay()];
+      const targetZhShortWeek = zhShortWeekdays[todayObj.getDay()];
 
       if (weekRows.length > 1) {
         weekRows.slice(1).forEach(r => {
           if (!r || !r.c) return;
           const row = r.c.map(parseCellText);
           const val = (row[0] || '').toString().trim();
-          if (val.includes(weekdayStr) || val.includes(shortWeekdayStr) || val === String(todayObj.getDay())) {
-            workItems.push({
-              typeTag: '<span style="font-weight:700; color:#c05621;">[周工作]</span>',
-              code: row[0]||'',
-              content: row[1]||'',
-              priority: row[2]||'中',
-              status: row[3]||'□',
-              weight: getPriorityWeight(row[2])
+          if (val.includes(targetZhWeek) || val.includes(targetZhShortWeek) || val === String(todayObj.getDay())) {
+            todayScheduleList.push({
+              assigned: '全員',
+              content: `${getPriorityBadge(row[2])} ${row[1]||''}`
             });
           }
         });
@@ -723,43 +662,38 @@
           const row = r.c.map(parseCellText);
           const val = (row[0] || '').toString().trim();
           if (val === String(dateNum) || val === dateNumStr || val === `${dateNum}號` || val === `${dateNum}日`) {
-            workItems.push({
-              typeTag: '<span style="font-weight:700; color:#dd6b20;">[日工作]</span>',
-              code: row[0]||'',
-              content: row[1]||'',
-              priority: row[2]||'中',
-              status: row[3]||'□',
-              weight: getPriorityWeight(row[2])
+            todayScheduleList.push({
+              assigned: '全員',
+              content: `${getPriorityBadge(row[2])} ${row[1]||''}`
             });
           }
         });
       }
 
-      workItems.sort((a, b) => b.weight - a.weight);
-      latestWorkItems = workItems;
-
-      if (workItems.length > 0) {
-        workTbody.innerHTML = workItems.map(item => 
-          `<tr><td class="center nowrap">${item.typeTag}</td><td class="center nowrap">${item.code}</td><td>${item.content}</td><td class="center nowrap">${item.priority}</td><td class="center nowrap">${item.status}</td></tr>`
-        ).join('');
-        blockWork.classList.remove('is-empty');
-      } else {
-        workTbody.innerHTML = '<tr><td colspan="5" class="center" style="color:#a0aec0;">今日無工作項目</td></tr>';
-        blockWork.classList.add('is-empty');
+      if (timeHandoverRows.length > 1) {
+        timeHandoverRows.slice(1).forEach(r => {
+          if (!r || !r.c) return;
+          const row = r.c.map(parseCellText);
+          if (isToday(row[0]) || isToday(row[5])) {
+            const timeStr = extractTimeText(r.c[5] || r.c[0]);
+            const timeSuffix = timeStr ? ` ${timeStr}` : '';
+            todayScheduleList.push({
+              assigned: row[3] || row[4] || '全員',
+              content: `<span class="badge badge-time">[指定時間]</span> ${row[2]||''}${timeSuffix}`
+            });
+          }
+        });
       }
-
-      // 2. 追蹤事項
-      const trackingTbody = document.getElementById('tb-tracking');
-      const blockTracking = document.getElementById('block-tracking');
-      let trackingHtml = '';
 
       if (handoverRows.length > 1) {
         handoverRows.slice(1).forEach(r => {
           if (!r || !r.c) return;
           const row = r.c.map(parseCellText);
           if (isToday(row[0]) || isToday(row[5]) || true) {
-            const staffPair = formatStaffPair(row[3], row[4]);
-            trackingHtml += `<tr><td class="center nowrap" style="font-weight:700; color:#c05621;">[工作交接]</td><td class="center nowrap">${formatSplitDateTime(r.c[0])}</td><td class="center nowrap">${row[1]||''}</td><td>${row[2]||''}</td><td class="center nowrap font-small">${staffPair}</td></tr>`;
+            todayScheduleList.push({
+              assigned: row[3] || row[4] || '全員',
+              content: `<span class="badge badge-track">[追蹤工作]</span> ${row[2]||''}`
+            });
           }
         });
       }
@@ -769,86 +703,191 @@
           if (!r || !r.c) return;
           const row = r.c.map(parseCellText);
           if (isToday(row[0]) || isToday(row[5]) || true) {
-            const staffPair = formatStaffPair(row[3], row[4]);
-            trackingHtml += `<tr><td class="center nowrap" style="font-weight:700; color:#dd6b20;">[物流追蹤]</td><td class="center nowrap">${formatSplitDateTime(r.c[0])}</td><td class="center nowrap">${row[1]||''}</td><td>${row[2]||''}</td><td class="center nowrap font-small">${staffPair}</td></tr>`;
+            todayScheduleList.push({
+              assigned: row[3] || row[4] || '全員',
+              content: `<span class="badge badge-track">[物流]</span> ${row[2]||''}`
+            });
           }
         });
       }
 
-      if (trackingHtml) {
-        trackingTbody.innerHTML = trackingHtml;
-        blockTracking.classList.remove('is-empty');
-      } else {
-        trackingTbody.innerHTML = '<tr><td colspan="5" class="center" style="color:#a0aec0;">今日無追蹤事項</td></tr>';
-        blockTracking.classList.add('is-empty');
-      }
-
-      // 3. 預約與指定時間交接
-      const appointTimeTbody = document.getElementById('tb-appoint-time');
-      const blockAppointTime = document.getElementById('block-appoint-time');
-      let appointTimeHtml = '';
       let appointSummaryList = [];
-
-      // 🌟 [指定交接] 完全不顯示時間
-      if (timeHandoverRows.length > 1) {
-        timeHandoverRows.slice(1).forEach(r => {
-          if (!r || !r.c) return;
-          const row = r.c.map(parseCellText);
-          if (isToday(row[0]) || isToday(row[5]) || isTomorrow(row[0]) || isTomorrow(row[5])) {
-            const isTm = isTomorrow(row[0]) || isTomorrow(row[5]);
-            const dateTag = isTm ? '<span style="color:#e53e3e; font-weight:700;">[明日]</span>' : '<span style="color:#c05621; font-weight:700;">[今日]</span>';
-            const handoverPeople = formatStaffPair(row[3], row[4]);
-            
-            const fullContent = row[2] || '';
-
-            appointTimeHtml += `<tr><td class="center nowrap" style="font-weight:700; color:#c05621;">[指定交接]</td><td class="center nowrap">${dateTag}</td><td>${fullContent}</td><td class="center nowrap font-small">${handoverPeople}</td></tr>`;
-          }
-        });
-      }
-
-      // 🌟 [諮詢預約] 顯示時間
       if (appointRows.length > 1) {
         appointRows.slice(1).forEach(r => {
           if (!r || !r.c) return;
           const row = r.c.map(parseCellText);
-          if (isToday(row[5]) || isToday(row[0]) || isTomorrow(row[5]) || isTomorrow(row[0])) {
-            const isTm = isTomorrow(row[5]) || isTomorrow(row[0]);
-            const dateTag = isTm ? '<span style="color:#e53e3e; font-weight:700;">[明日]</span>' : '<span style="color:#c05621; font-weight:700;">[今日]</span>';
+          if (isToday(row[5]) || isToday(row[0])) {
             const clientName = row[1] || '';
             const phone = row[4] ? ` (${row[4]})` : '';
             const eventContent = row[2] || '';
-            
-            // 直接抓取時間欄位的文字 (優先取第 6 欄，若無取第 1 欄)
             const rawTime = extractTimeText(r.c[5] || r.c[0]);
-            const timeTag = rawTime ? ` <span class="time-tag">(${rawTime})</span>` : '';
+            const timeSuffix = rawTime ? ` ${rawTime}` : '';
 
-            const fullContent = clientName 
-              ? `<strong>${clientName}</strong>：${eventContent}${phone}${timeTag}` 
-              : `${eventContent}${phone}${timeTag}`;
-            
-            if (!isTm) appointSummaryList.push(`${clientName}(${eventContent})`);
+            todayScheduleList.push({
+              assigned: row[3] || '全員',
+              content: `<span class="badge badge-appoint">[預約]</span> ${clientName ? clientName : ''}${phone}：${eventContent}${timeSuffix}`
+            });
 
-            appointTimeHtml += `<tr><td class="center nowrap" style="font-weight:700; color:#dd6b20;">[諮詢預約]</td><td class="center nowrap">${dateTag}</td><td>${fullContent}</td><td class="center nowrap font-small">${row[3]||''}</td></tr>`;
+            if (clientName) appointSummaryList.push(`${clientName}(${eventContent}${rawTime ? ' ' + rawTime : ''})`);
           }
         });
       }
 
+      latestWorkItems = todayScheduleList;
       latestAppointSummaryList = appointSummaryList;
 
-      if (appointTimeHtml) {
-        appointTimeTbody.innerHTML = appointTimeHtml;
-        blockAppointTime.classList.remove('is-empty');
-      } else {
-        appointTimeTbody.innerHTML = '<tr><td colspan="4" class="center" style="color:#a0aec0;">今日與明日無預約事項</td></tr>';
-        blockAppointTime.classList.add('is-empty');
+      const tbSchedule = document.getElementById('tb-todays-schedule');
+      let scheduleHtml = '';
+
+      if (todayScheduleList.length > 0) {
+        scheduleHtml += todayScheduleList.map(item => `
+          <tr>
+            <td class="center" style="font-weight: 600;">${item.assigned}</td>
+            <td>${item.content}</td>
+          </tr>
+        `).join('');
       }
 
-      // 4. 出勤班表與醫師請假月曆
-      renderTodayRoster(rosterRows);
-      renderDoctorLeaveCalendar(leaveRows);
+      const emptyCount = Math.max(2, 15 - todayScheduleList.length);
+      for (let i = 0; i < emptyCount; i++) {
+        scheduleHtml += `
+          <tr>
+            <td class="center">&nbsp;</td>
+            <td>&nbsp;</td>
+          </tr>
+        `;
+      }
 
-      // AI 講稿生成 (帶入快取機制)
-      await generateAIContent(workItems, appointSummaryList, leaveRows);
+      tbSchedule.innerHTML = scheduleHtml;
+
+      // 下一個營業日
+      const nextWorkdayObj = findNextWorkday(rosterRows);
+      const nextMonthNum = nextWorkdayObj.getMonth() + 1;
+      const nextDateNum = nextWorkdayObj.getDate();
+      const nextDayZh = zhWeekdaysShort[nextWorkdayObj.getDay()];
+
+      document.getElementById('title-next-workday').innerText = `Next Workday Schedule (${nextMonthNum}/${nextDateNum} ${nextDayZh})`;
+
+      // 擷取下一個營業日事項
+      let nextWorkdayScheduleList = [];
+      if (timeHandoverRows.length > 1) {
+        timeHandoverRows.slice(1).forEach(r => {
+          if (!r || !r.c) return;
+          const row = r.c.map(parseCellText);
+          if (checkDateMatch(nextWorkdayObj, row[0]) || checkDateMatch(nextWorkdayObj, row[5])) {
+            const rawTime = extractTimeText(r.c[5] || r.c[0]);
+            const timeSuffix = rawTime ? ` ${rawTime}` : '';
+            nextWorkdayScheduleList.push(`<span class="badge badge-time">[指定時間]</span> ${row[2]||''}${timeSuffix}`);
+          }
+        });
+      }
+      if (appointRows.length > 1) {
+        appointRows.slice(1).forEach(r => {
+          if (!r || !r.c) return;
+          const row = r.c.map(parseCellText);
+          if (checkDateMatch(nextWorkdayObj, row[5]) || checkDateMatch(nextWorkdayObj, row[0])) {
+            const clientName = row[1] || '';
+            const phone = row[4] ? ` (${row[4]})` : '';
+            const eventContent = row[2] || '';
+            const rawTime = extractTimeText(r.c[5] || r.c[0]);
+            nextWorkdayScheduleList.push(`<span class="badge badge-appoint">[預約]</span> ${clientName ? clientName : ''}${phone}：${eventContent}${rawTime ? ' ' + rawTime : ''}`);
+          }
+        });
+      }
+
+      const colTomorrow = document.getElementById('col-tomorrows-schedule');
+      if (nextWorkdayScheduleList.length > 0) {
+        colTomorrow.innerHTML = nextWorkdayScheduleList.map(item => `<div style="margin-bottom:3px;">• ${item}</div>`).join('');
+      } else {
+        colTomorrow.innerHTML = '<div class="center" style="color:#a0aec0; padding: 15px 0;">-無預約與交接事項-</div>';
+      }
+
+      // Doctor's notice
+      const docGroupMap = {};
+      if (leaveRows && leaveRows.length > 1) {
+        leaveRows.slice(1).forEach(r => {
+          if (!r || !r.c) return;
+          const dateText = parseCellText(r.c[0]);
+          if (!dateText) return;
+
+          const match = dateText.match(/(?:(\d{4})[/-])?(\d{1,2})[/-](\d{1,2})/);
+          if (match) {
+            const parsedYear = match[1] ? parseInt(match[1], 10) : year;
+            const parsedMonth = parseInt(match[2], 10);
+            const parsedDay = parseInt(match[3], 10);
+
+            const rowData = r.c.map(parseCellText);
+            const shift = rowData[1] || '';
+            const docName = rowData[2] || '醫師';
+            const type = rowData[3] || '請';
+            const subDoc = rowData[4] ? `(換)${rowData[4]}` : `(${type})`;
+
+            const timestamp = new Date(parsedYear, parsedMonth - 1, parsedDay).getTime();
+            const dateShort = `${parsedMonth}/${parsedDay}`;
+
+            if (!docGroupMap[docName]) docGroupMap[docName] = [];
+
+            docGroupMap[docName].push({
+              timestamp: timestamp,
+              dateShort: dateShort,
+              shift: shift,
+              subDoc: subDoc
+            });
+          }
+        });
+      }
+
+      let docNoticeHtml = '';
+      const docNames = Object.keys(docGroupMap);
+      if (docNames.length > 0) {
+        docNames.forEach(name => {
+          const list = docGroupMap[name];
+          list.sort((a, b) => a.timestamp - b.timestamp);
+          const dateDescPairs = list.map(item => `${item.dateShort}${item.shift}${item.subDoc}`);
+
+          docNoticeHtml += `
+            <div class="doc-card">
+              <div class="doc-name-title">👨‍⚕️ ${name} 醫師異動：</div>
+              <div class="doc-dates-text">${dateDescPairs.join('、')}</div>
+            </div>
+          `;
+        });
+      } else {
+        docNoticeHtml = '<div class="center" style="color:#a0aec0; margin-top:10px;">-無醫師請假資料-</div>';
+      }
+      document.getElementById('col-doctor-notice').innerHTML = docNoticeHtml;
+
+      // 【今日上班人員】
+      let rosterItems = [];
+      if (rosterRows && rosterRows.length > 1) {
+        rosterRows.slice(1).forEach(r => {
+          if (!r || !r.c) return;
+          const rowData = r.c.map(parseCellText);
+          if (isToday(rowData[0])) {
+            const shiftName = rowData[2] || '';
+            const staffNames = rowData[1] || '';
+            if (staffNames) {
+              rosterItems.push(`<span class="staff-inline-item"><strong>${staffNames}</strong>(${shiftName})</span>`);
+            }
+          }
+        });
+      }
+
+      const colRoster = document.getElementById('col-staff-roster');
+      if (rosterItems.length > 0) {
+        colRoster.innerHTML = `<span class="staff-title">【今日上班人員】</span>` + rosterItems.join('');
+      } else {
+        colRoster.innerHTML = `
+          <span class="staff-title">【今日上班人員】</span>
+          <span class="staff-inline-item"><strong>林哲玄</strong>(早班)</span>
+          <span class="staff-inline-item"><strong>黃政中</strong>(晚班)</span>
+          <span class="staff-inline-item"><strong>陳昱伶</strong>(結帳)</span>
+          <span class="staff-inline-item"><strong>吳曉婷</strong>(值日)</span>
+        `;
+      }
+
+      // 改為本地資料彙整
+      generateLocalSummary(todayScheduleList, appointSummaryList, leaveRows);
 
     } catch (err) {
       console.error("載入發生例外錯誤：", err);
@@ -861,231 +900,77 @@
     }
   }
 
-  function renderTodayRoster(rows) {
-    const tbody = document.getElementById('tb-roster');
-    tbody.innerHTML = '';
-
-    if (!rows || rows.length <= 0) {
-      tbody.innerHTML = '<tr><td colspan="2" class="center" style="color:#a0aec0;">今日無班表資料</td></tr>';
-      return;
-    }
-
-    const todayItems = [];
-    rows.forEach(r => {
-      if (!r || !r.c) return;
-      const rowData = r.c.map(parseCellText);
-      if (isToday(rowData[0])) {
-        todayItems.push(`<strong>${rowData[2]||'出勤'}：</strong>${rowData[1]||''}`);
-      }
+ // 🌟 管理職視角：本日重點數據儀表板
+  function generateLocalSummary(workItems, appointSummaryList, leaveRows) {
+    const summaryEl = document.getElementById('ai-summary-text');
+    
+    // 1. 統計工作項目
+    let highPriorityCount = 0;
+    let trackCount = 0;
+    let logisticsCount = 0;
+    
+    workItems.forEach(item => {
+      const content = item.content || '';
+      if (content.includes('badge-high')) highPriorityCount++;
+      if (content.includes('[追蹤工作]')) trackCount++;
+      if (content.includes('[物流]')) logisticsCount++;
     });
 
-    if (todayItems.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="2" class="center" style="color:#a0aec0;">今日無相符班表</td></tr>';
-      return;
-    }
+    // 2. 統計預約數量
+    const todayAppointCount = appointSummaryList.length;
 
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td class="center nowrap" style="font-weight:700; color:#2b6cb0;">${todayStr}</td><td>${todayItems.join(' &nbsp;|&nbsp; ')}</td>`;
-    tbody.appendChild(tr);
-  }
-
-  function renderDoctorLeaveCalendar(rows) {
-    const eventsMap = {};
-
-    if (rows && rows.length > 0) {
-      rows.forEach(r => {
+    // 3. 檢查今日是否有醫師請假
+    let docLeaveToday = false;
+    if (leaveRows && leaveRows.length > 1) {
+      leaveRows.slice(1).forEach(r => {
         if (!r || !r.c) return;
-        
         const dateText = parseCellText(r.c[0]);
-        if (!dateText) return;
-
-        const match = dateText.match(/(\d{4})[/-](\d{1,2})[/-](\d{1,2})/);
-        if (match) {
-          const y = parseInt(match[1], 10);
-          const m = parseInt(match[2], 10);
-          const d = parseInt(match[3], 10);
-
-          const rowData = r.c.map(parseCellText);
-          const shift = rowData[1] ? rowData[1].toString().substring(0, 1) : '班';
-          const type = rowData[3] ? rowData[3].toString().trim() : '';
-          
-          const targetName = (type === '換' && rowData[4]) ? rowData[4] : rowData[2];
-          const secondChar = getSecondChar(targetName);
-
-          if (secondChar) {
-            const formattedKey = toStandardDateKey(y, m, d);
-            if (!eventsMap[formattedKey]) eventsMap[formattedKey] = [];
-            
-            eventsMap[formattedKey].push({
-              text: `${shift}-${secondChar}`,
-              isStrike: (type !== '換')
-            });
-          }
+        if (isToday(dateText)) {
+          docLeaveToday = true;
         }
       });
     }
 
-    buildHorizontalRow(year, month, 'lbl-curr-month', 'row-curr-month', eventsMap);
-    const nextM = new Date(year, month + 1, 1);
-    buildHorizontalRow(nextM.getFullYear(), nextM.getMonth(), 'lbl-next-month', 'row-next-month', eventsMap);
-  }
+    // 4. 統計次工作日預約 (從畫面已產生的內容中抓取)
+    const colTomorrowHtml = document.getElementById('col-tomorrows-schedule').innerHTML;
+    const nextDayAppointCount = (colTomorrowHtml.match(/\[預約\]/g) || []).length;
 
-  function buildHorizontalRow(y, m, labelId, rowId, eventsMap) {
-    const displayMonth = m + 1;
-    document.getElementById(labelId).innerText = `【 ${y} 年 ${displayMonth} 月 醫師請假/異動表 】`;
-    const rowEl = document.getElementById(rowId);
-    rowEl.innerHTML = '';
-
-    const totalDaysInMonth = new Date(y, m + 1, 0).getDate();
-
-    for (let d = 1; d <= 31; d++) {
-      const box = document.createElement('div');
-      box.className = 'cal-day-box';
-
-      if (d > totalDaysInMonth) {
-        box.style.opacity = '0.15';
-        box.style.backgroundColor = '#f7fafc';
-        rowEl.appendChild(box);
-        continue;
-      }
-
-      const currDateObj = new Date(y, m, d);
-      const dayOfWeek = currDateObj.getDay();
-      
-      const weekEl = document.createElement('div');
-      weekEl.className = 'cal-day-weekday';
-      weekEl.innerText = shortWeekdays[dayOfWeek];
-      box.appendChild(weekEl);
-
-      const num = document.createElement('div');
-      num.className = 'cal-day-num';
-      num.innerText = d;
-      box.appendChild(num);
-
-      if (dayOfWeek === 0) {
-        box.classList.add('is-sunday');
-      }
-
-      const fullKey = toStandardDateKey(y, displayMonth, d);
-      const leaveList = eventsMap[fullKey] || [];
-
-      if (leaveList.length > 0) {
-        box.classList.add('has-leave');
-        leaveList.forEach(item => {
-          const docEl = document.createElement('div');
-          docEl.className = 'cal-doctor-leave';
-          docEl.innerText = item.text;
-          
-          if (!item.isStrike) {
-            docEl.style.textDecoration = 'none';
-            docEl.style.color = '#2b6cb0';
-            docEl.style.fontWeight = 'bold';
-          }
-
-          box.appendChild(docEl);
-        });
-      }
-
-      rowEl.appendChild(box);
-    }
-  }
-
-  async function generateAIContent(workItems, appointSummaryList, leaveRows, forceRefresh = false) {
-    const summaryEl = document.getElementById('ai-summary-text');
-    const cacheKeyDate = 'ai_speech_date';
-    const cacheKeyText = 'ai_speech_text';
-
-    const cachedDate = localStorage.getItem(cacheKeyDate);
-    const cachedText = localStorage.getItem(cacheKeyText);
-
-    if (!forceRefresh && cachedDate === todayStr && cachedText) {
-      summaryEl.innerHTML = cachedText + ` <span style="font-size:6.5pt; color:#a0aec0; margin-left:4px;">(讀取當日快取)</span>`;
-      return;
-    }
-
-    let leaveDocs = [];
-    if (leaveRows && leaveRows.length > 0) {
-      leaveRows.forEach(r => {
-        if (!r || !r.c) return;
-        const row = r.c.map(parseCellText);
-        if (isToday(row[0])) {
-          leaveDocs.push(`${row[2]||'醫師'}${row[3]||'異動'}${row[4] ? '(由'+row[4]+'代班)' : ''}`);
-        }
-      });
-    }
-
-    const taskText = workItems.map(i => `${i.content}(重要度:${i.priority})`).join('；') || '無特殊工作';
-    const appointText = appointSummaryList.join('；') || '無預約';
-    const doctorText = leaveDocs.join('；') || '醫師全員正常出勤';
-
-    const promptText = `你現在是「大學眼鏡桃園南崁店」的專業門市店長，請根據以下今日營運數據，寫一段流暢、專業且有溫度的【晨會主管口述講稿與注意事項】。
-- 當日工作任務：${taskText}
-- 今日顧客預約與驗光/諮詢：${appointText}
-- 醫師門診與請假代班動態：${doctorText}
-
-請遵守輸出規範：
-1. 第一句開頭統一為：「各位同仁大家早安，以下為今日大學眼鏡南崁店晨會重點：」
-2. 分成 3 個點條列講稿，親切專業。
-3. 最後附上：「💡 店長提醒：[針對驗光專業、顧客服務或衛教給一句叮嚀]」
-4. 使用繁體中文，加上 HTML <strong> 標籤，字數 150 字以內，直接輸出 HTML。`;
-
-    const modelsToTry = [
-      'gemini-2.0-flash',
-      'gemini-1.5-flash',
-      'gemini-1.5-flash-8b'
-    ];
-
-    for (const model of modelsToTry) {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
-      
-      try {
-        const response = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }] })
-        });
-
-        const data = await response.json();
-        
-        if (response.ok && data.candidates && data.candidates[0].content) {
-          let aiResult = data.candidates[0].content.parts[0].text;
-          const cleanHtml = aiResult.replace(/```html/g, '').replace(/```/g, '').trim();
-          
-          summaryEl.innerHTML = cleanHtml;
-
-          localStorage.setItem(cacheKeyDate, todayStr);
-          localStorage.setItem(cacheKeyText, cleanHtml);
-          return;
-        }
-      } catch (e) {
-        console.error(`[${model}] 連線失敗`, e);
-      }
-    }
-
-    let fallbackText = `<strong>各位同仁大家早安，以下為今日大學眼鏡南崁店晨會重點：</strong><br>`;
-    const highTasks = workItems.filter(i => i.weight === 3);
+    // 5. 組裝管理職數據儀表板 (四區塊獨立卡片)
     
-    if (highTasks.length > 0) {
-      fallbackText += `1. 今日重點工作共 <strong>${highTasks.length}</strong> 項，優先處理「${highTasks[0].content}」，請責任同仁於開診前確認完成。<br>`;
-    } else {
-      fallbackText += `1. 今日各崗位工作正常推進，請同仁維持環境潔淨與驗光儀器每日清潔校正。<br>`;
-    }
+    // 卡片一：醫師/人力狀況 (紅燈/綠燈管理)
+    const hrBg = docLeaveToday ? 'background-color:#fff5f5; border-color:#feb2b2;' : 'background-color:#f0fff4; border-color:#9ae6b4;';
+    const hrText = docLeaveToday ? '<span style="color:#c53030;">⚠️ 異動請假</span>' : '<span style="color:#276749;">✅ 出勤正常</span>';
+    
+    // 卡片二：優先急件狀況 (橘燈警示)
+    const priBg = highPriorityCount > 0 ? 'background-color:#fffaf0; border-color:#fbd38d;' : '';
+    const priText = highPriorityCount > 0 ? `<span style="color:#dd6b20;">🚨 ${highPriorityCount} 筆待辦</span>` : '<span style="color:#a0aec0;">無急件</span>';
 
-    if (appointSummaryList.length > 0) {
-      fallbackText += `2. 今日預約顧客共 <strong>${appointSummaryList.length}</strong> 組，請櫃檯與驗光師提早備妥衛教單張與試戴片。<br>`;
-    } else {
-      fallbackText += `2. 今日預約時段較有彈性，請同仁把握空檔安排鏡框盤點與保養服務。<br>`;
-    }
+    // 卡片三：今日常規營運
+    const opsText = `預約 <span style="color:#3182ce; font-size:8.5pt;">${todayAppointCount}</span> ｜ 追蹤 <span style="color:#3182ce; font-size:8.5pt;">${trackCount}</span> ｜ 物流 <span style="color:#3182ce; font-size:8.5pt;">${logisticsCount}</span>`;
 
-    if (leaveDocs.length > 0) {
-      fallbackText += `3. <strong>醫師異動提醒：</strong>今日門診包括 ${leaveDocs.join('；')}，引導患者時請留意說明。<br>`;
-    } else {
-      fallbackText += `3. 門診醫師全員出勤，請保持順暢的引導與驗光照護流程。<br>`;
-    }
+    // 卡片四：次日準備 (紫燈提示)
+    const prepBg = nextDayAppointCount > 0 ? 'background-color:#faf5ff; border-color:#e9d8fd;' : '';
+    const prepText = nextDayAppointCount > 0 ? `💬 提醒簡訊 <span style="color:#805ad5; font-size:8.5pt;">${nextDayAppointCount} 筆</span>` : '<span style="color:#a0aec0;">無預約</span>';
 
-    fallbackText += `<span style="color:#276749; font-weight:700;">💡 提醒夥伴：</span>請確實完成各項交接與物流確認，給顧客最專業的大學眼鏡品質，大家加油！`;
-
-    summaryEl.innerHTML = fallbackText;
+    // 注入新排版 HTML
+    summaryEl.innerHTML = `
+      <div class="dash-card" style="${hrBg}">
+        <div class="dash-card-title">👨‍⚕️ 醫師人力</div>
+        <div class="dash-card-value">${hrText}</div>
+      </div>
+      <div class="dash-card" style="${priBg}">
+        <div class="dash-card-title">🔥 優先急件</div>
+        <div class="dash-card-value">${priText}</div>
+      </div>
+      <div class="dash-card" style="flex: 1.5; background-color:#ebf8ff; border-color:#bee3f8;">
+        <div class="dash-card-title">📊 今日營運任務</div>
+        <div class="dash-card-value">${opsText}</div>
+      </div>
+      <div class="dash-card" style="${prepBg}">
+        <div class="dash-card-title">⏩ 次日準備</div>
+        <div class="dash-card-value">${prepText}</div>
+      </div>
+    `;
   }
 
   window.onload = loadAllSheets;
