@@ -196,8 +196,9 @@
   .badge-time { background-color: #ebf8ff; color: #2c5282; border: 1px solid #bee3f8; }
   .badge-track { background-color: #e6fffa; color: #234e52; border: 1px solid #b2f5ea; }
   .badge-appoint { background-color: #faf5ff; color: #553c9a; border: 1px solid #e9d8fd; }
+  .badge-doc { background-color: #fff5f5; color: #c53030; border: 1px solid #feb2b2; }
 
-  /* 下半區：左右 2 大欄配置 */
+  /* 下半區：左右 2 大欄配置 (調整為各 50% 均衡分配) */
   .bottom-layout {
     display: table;
     width: 100%;
@@ -245,11 +246,29 @@
     margin-bottom: 2px;
   }
 
-  .doc-dates-text {
+  /* 雙排佈局容器：自動依內容長度分雙欄顯示 */
+  .doc-dates-text-grid {
+    column-count: 2;
+    column-gap: 6px;
     font-size: 6.8pt;
     color: #4a5568;
     line-height: 1.25;
-    word-break: break-all;
+  }
+
+  .doc-date-group {
+    break-inside: avoid;
+    margin-bottom: 2px;
+    font-size: 6.8pt;
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .doc-date-tag {
+    font-weight: 700;
+    color: #2d3748;
+    margin-right: 2px;
   }
 
   /* 班表人員：放在左欄下方獨立單列 */
@@ -262,19 +281,18 @@
     color: #2d3748;
     display: flex;
     align-items: center;
-    flex-wrap: nowrap;
-    overflow: hidden;
+    flex-wrap: wrap;
+    gap: 4px 8px;
   }
 
   .staff-title {
     font-weight: 800;
     color: #2b6cb0;
-    margin-right: 6px;
+    margin-right: 4px;
     white-space: nowrap;
   }
 
   .staff-inline-item {
-    margin-right: 10px;
     white-space: nowrap;
   }
 
@@ -423,23 +441,23 @@
       </table>
     </div>
 
-    <!-- 下半區：左右 2 大欄配置 -->
+    <!-- 下半區：左右 2 大欄配置 (左 50% / 右 50%) -->
     <div class="bottom-layout">
-      <!-- 欄位 1: Next Workday's schedule + 【今日上班人員】底欄 (左 68%) -->
-      <div class="bottom-col" style="width: 68%;">
+      <!-- 欄位 1: Next Workday's schedule + 【今日上班人員】底欄 (左 50%) -->
+      <div class="bottom-col" style="width: 50%;">
         <div class="bottom-col-title" id="title-next-workday">Next Workday's schedule</div>
-        <div class="bottom-col-content" id="col-tomorrows-schedule" style="min-height: 90px;">
+        <div class="bottom-col-content" id="col-tomorrows-schedule" style="min-height: 80px;">
           <div class="loading center">載入中...</div>
         </div>
 
-        <!-- 【今日上班人員】簡約單列 -->
+        <!-- 【今日上班人員】簡約底欄 -->
         <div class="staff-roster-bar" id="col-staff-roster">
           <!-- 動態填入班表人員 -->
         </div>
       </div>
 
-      <!-- 欄位 2: Doctor's notice (右 32%) -->
-      <div class="bottom-col" style="width: 32%; border-left: none;">
+      <!-- 欄位 2: Doctor's notice (右 50%) -->
+      <div class="bottom-col" style="width: 50%; border-left: none;">
         <div class="bottom-col-title">Doctor's notice</div>
         <div class="bottom-col-content" style="padding: 3px;">
           <div id="col-doctor-notice">
@@ -695,6 +713,15 @@
 
       let todayScheduleList = [];
 
+      // ================= 計算下一個工作日 =================
+      const nextWorkdayObj = findNextWorkday(rosterData);
+      const nextY = nextWorkdayObj.getFullYear();
+      const nextM = pad(nextWorkdayObj.getMonth() + 1);
+      const nextD = pad(nextWorkdayObj.getDate());
+      const nextSlash = `${nextY}/${nextM}/${nextD}`;
+      const nextDash = `${nextY}-${nextM}-${nextD}`;
+      const nextDayZh = ['日', '一', '二', '三', '四', '五', '六'][nextWorkdayObj.getDay()];
+
       // 建立指派人對照 Map
       const assignMap = {};
       (taskData || []).filter(t => t.category === 'assign').forEach(a => {
@@ -773,14 +800,18 @@
         .gte('date', todayDash) // 查詢今天起未來的所有醫師請假/代診/異動
         .order('date', { ascending: true });
 
+      // docGroupMap 結構: { 醫師姓名: { "M/D": [ "早診(請)", "午診(換)林醫師" ] } }
       const docGroupMap = {};
+      let hasDocLeaveToday = false;
+      let nextWorkdayDocItems = [];
 
       (docChanges || []).forEach(r => {
         // 排除已取消的異動
         if (r.type === '取消異動') return;
 
         const docName = r.old_staff || '醫師';
-        const dateParts = r.date.split('-');
+        const rawDate = r.date || '';
+        const dateParts = rawDate.split('-');
         const dateShort = `${parseInt(dateParts[1], 10)}/${parseInt(dateParts[2], 10)}`;
         const shiftShort = (r.shift || '').replace('班', '診');
 
@@ -794,8 +825,28 @@
           changeDesc = r.note ? `(${r.note})` : `(備註)`;
         }
 
-        if (!docGroupMap[docName]) docGroupMap[docName] = [];
-        docGroupMap[docName].push(`${dateShort}${shiftShort}${changeDesc}`);
+        // 1. 若為「當日」異動 -> 顯示在 Today's schedule 頂部
+        if (rawDate === todayDash || rawDate === todaySlash) {
+          hasDocLeaveToday = true;
+          todayScheduleList.unshift({
+            assigned: '醫師公告',
+            content: `<span class="badge badge-doc">[醫師異動]</span> ${docName}醫師：${shiftShort} ${changeDesc}`
+          });
+        }
+
+        // 2. 若為「下一個工作日」異動 -> 收集準備合併顯示在 Next Workday's schedule 內
+        if (rawDate === nextDash || rawDate === nextSlash) {
+          nextWorkdayDocItems.push(`<span class="badge badge-doc">[醫師異動]</span> ${docName}醫師：${shiftShort} ${changeDesc}`);
+        }
+
+        // 3. 醫師請假 notice 內：先分醫師，裡面再分日期
+        if (!docGroupMap[docName]) {
+          docGroupMap[docName] = {};
+        }
+        if (!docGroupMap[docName][dateShort]) {
+          docGroupMap[docName][dateShort] = [];
+        }
+        docGroupMap[docName][dateShort].push(`${shiftShort}${changeDesc}`);
       });
 
       let docNoticeHtml = '';
@@ -803,11 +854,22 @@
 
       if (docNames.length > 0) {
         docNames.forEach(name => {
-          const dateListStr = docGroupMap[name].join('、');
+          const dateMap = docGroupMap[name];
+          let dateItemsHtml = '';
+          
+          Object.keys(dateMap).forEach(dShort => {
+            const shiftsStr = dateMap[dShort].join('、');
+            dateItemsHtml += `
+              <div class="doc-date-group">
+                <span class="doc-date-tag">📅 ${dShort}：</span>${shiftsStr}
+              </div>
+            `;
+          });
+
           docNoticeHtml += `
             <div class="doc-card">
               <div class="doc-name-title">👨‍⚕️ ${name} 醫師異動：</div>
-              <div class="doc-dates-text">${dateListStr}</div>
+              <div class="doc-dates-text-grid">${dateItemsHtml}</div>
             </div>
           `;
         });
@@ -819,9 +881,10 @@
       document.getElementById('col-doctor-notice').innerHTML = docNoticeHtml;
       // ==============================================================================================
 
-      // 依重要性優先度排序：高 > 中 > 低 (其他項目次之)
+      // 依重要性優先度排序：高 > 中 > 低 (其他項目次之，但醫師異動優先保留在最前)
       const getPriorityWeight = (contentStr) => {
-        if (!contentStr) return 4;
+        if (!contentStr) return 5;
+        if (contentStr.includes('badge-doc') || contentStr.includes('[醫師異動]')) return 0;
         if (contentStr.includes('badge-high') || contentStr.includes('[高]')) return 1;
         if (contentStr.includes('[中]')) return 2;
         if (contentStr.includes('[低]')) return 3;
@@ -852,21 +915,18 @@
       }
       tbSchedule.innerHTML = scheduleHtml;
 
-      // ================= 次營業日日程自動判讀 =================
-      const nextWorkdayObj = findNextWorkday(rosterData);
-      const nextY = nextWorkdayObj.getFullYear();
-      const nextM = pad(nextWorkdayObj.getMonth() + 1);
-      const nextD = pad(nextWorkdayObj.getDate());
-      const nextSlash = `${nextY}/${nextM}/${nextD}`;
-      const nextDash = `${nextY}-${nextM}-${nextD}`;
-      const nextDayZh = ['日', '一', '二', '三', '四', '五', '六'][nextWorkdayObj.getDay()];
-
+      // ================= 次營業日日程渲染 =================
       const titleNextEl = document.getElementById('title-next-workday');
       if (titleNextEl) {
         titleNextEl.innerText = `Next Workday Schedule (${parseInt(nextM,10)}/${parseInt(nextD,10)} ${nextDayZh})`;
       }
 
       let nextWorkdayItems = [];
+
+      // 0. 次營業日：醫師異動 (置頂)
+      if (nextWorkdayDocItems.length > 0) {
+        nextWorkdayItems.push(...nextWorkdayDocItems);
+      }
 
       // 1. 次營業日：指定時間交接
       (handoverData || []).forEach(h => {
@@ -913,7 +973,11 @@
         }
       }
 
-      generateLocalSummary(todayScheduleList, appointSummaryList, []);
+      latestWorkItems = todayScheduleList;
+      latestAppointSummaryList = appointSummaryList;
+      latestLeaveRows = hasDocLeaveToday ? [{ c: [{ v: todayDash }] }] : [];
+
+      generateLocalSummary(todayScheduleList, appointSummaryList, latestLeaveRows);
     } catch (err) {
       console.error("日報載入失敗:", err);
     } finally {
@@ -927,7 +991,7 @@
     }
   }
 
- // 🌟 管理職視角：本日重點數據儀表板
+  // 🌟 管理職視角：本日重點數據儀表板
   function generateLocalSummary(workItems, appointSummaryList, leaveRows) {
     const summaryEl = document.getElementById('ai-summary-text');
     
@@ -947,16 +1011,7 @@
     const todayAppointCount = appointSummaryList.length;
 
     // 3. 檢查今日是否有醫師請假
-    let docLeaveToday = false;
-    if (leaveRows && leaveRows.length > 1) {
-      leaveRows.slice(1).forEach(r => {
-        if (!r || !r.c) return;
-        const dateText = parseCellText(r.c[0]);
-        if (isToday(dateText)) {
-          docLeaveToday = true;
-        }
-      });
-    }
+    let docLeaveToday = (leaveRows && leaveRows.length > 0);
 
     // 4. 統計次工作日預約 (從畫面已產生的內容中抓取)
     const colTomorrowHtml = document.getElementById('col-tomorrows-schedule').innerHTML;
