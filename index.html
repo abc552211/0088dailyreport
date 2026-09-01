@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <title>大學眼鏡桃園南崁 - 工作簡報</title>
 <style>
   @page {
@@ -589,156 +592,251 @@
     return '<span class="badge badge-medium">[中]</span>';
   }
 
-  /* 🔍 動態尋找下一個有排班的營業日 */
-  function findNextWorkday(rosterRows) {
+  /* 自動依據班表資料，從明天開始找到下一個全店有上班的營業日 */
+  function findNextWorkdayFromSchedules(scheduleList) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
     for (let offset = 1; offset <= 30; offset++) {
-      const checkObj = new Date(todayObj);
-      checkObj.setDate(todayObj.getDate() + offset);
+      const nextDate = new Date(today);
+      nextDate.setDate(today.getDate() + offset);
 
-      let hasStaff = false;
-      if (rosterRows && rosterRows.length > 1) {
-        rosterRows.slice(1).forEach(r => {
-          if (!r || !r.c) return;
-          const rowData = r.c.map(parseCellText);
-          if (checkDateMatch(checkObj, rowData[0])) {
-            const staffNames = (rowData[1] || '').trim();
-            if (staffNames !== '') hasStaff = true;
-          }
-        });
+      const y = nextDate.getFullYear();
+      const m = String(nextDate.getMonth() + 1).padStart(2, '0');
+      const d = String(nextDate.getDate()).padStart(2, '0');
+      const dateKeySlash = `${y}/${m}/${d}`;
+      const dateKeyDash = `${y}-${m}-${d}`;
+
+      // 檢查該日是否有任一同仁有上班班別
+      const hasWorkingStaff = (scheduleList || []).some(s => {
+        const sDate = String(s.date || '').trim();
+        const isMatchedDate = (sDate === dateKeySlash || sDate === dateKeyDash);
+        const isWorking = s.shift_type && s.shift_type.trim() !== '' && s.shift_type.trim() !== '休假';
+        return isMatchedDate && isWorking;
+      });
+
+      if (hasWorkingStaff) {
+        return nextDate; // 找到下一個營業日
       }
-
-      if (hasStaff) return checkObj;
     }
 
-    const defaultTm = new Date(todayObj);
-    defaultTm.setDate(todayObj.getDate() + 1);
-    return defaultTm;
+    // 若查無資料，預設為明天
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+    return tomorrow;
+  }
+
+  const SUPABASE_URL = "https://niytitszugkfsfdwlwqt.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_dsxxWLXxfbTHmXOfmEUUfA_Y8h1tykR";
+  const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  /* 自動依據班表，尋找下一個全店有上班的營業日 */
+  function findNextWorkday(scheduleList) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    for (let offset = 1; offset <= 30; offset++) {
+      const nextDate = new Date(today);
+      nextDate.setDate(today.getDate() + offset);
+
+      const y = nextDate.getFullYear();
+      const m = String(nextDate.getMonth() + 1).padStart(2, '0');
+      const d = String(nextDate.getDate()).padStart(2, '0');
+      const dateKeySlash = `${y}/${m}/${d}`;
+      const dateKeyDash = `${y}-${m}-${d}`;
+
+      const hasWorkingStaff = (scheduleList || []).some(s => {
+        const sDate = String(s.date || '').trim();
+        const isMatched = (sDate === dateKeySlash || sDate === dateKeyDash);
+        const isWorking = s.shift_type && s.shift_type.trim() !== '' && s.shift_type.trim() !== '休假';
+        return isMatched && isWorking;
+      });
+
+      if (hasWorkingStaff) return nextDate;
+    }
+
+    const defaultNext = new Date(today);
+    defaultNext.setDate(today.getDate() + 1);
+    return defaultNext;
   }
 
   async function loadAllSheets() {
     const maskEl = document.getElementById('full-page-mask');
-    maskEl.style.display = 'flex';
-    maskEl.style.opacity = '1';
-    maskEl.style.visibility = 'visible';
+    if (maskEl) {
+      maskEl.style.display = 'flex';
+      maskEl.style.opacity = '1';
+      maskEl.style.visibility = 'visible';
+    }
 
     try {
-      const [weekRows, dayRows, handoverRows, logisticsRows, timeHandoverRows, appointRows, rosterRows, leaveRows] = await Promise.all([
-        fetchSheetData(GIDS.week),
-        fetchSheetData(GIDS.day),
-        fetchSheetData(GIDS.handover),
-        fetchSheetData(GIDS.logistics),
-        fetchSheetData(GIDS.timeHandover),
-        fetchSheetData(GIDS.appoint),
-        fetchSheetData(GIDS.roster),
-        fetchSheetData(GIDS.leave)
+      // 1. 批次向 Supabase 撈取所有所需資料
+      const [
+        { data: taskData },
+        { data: consultData },
+        { data: handoverData },
+        { data: rosterData }
+      ] = await Promise.all([
+        _supabase.from('task_configs').select('*').order('item_order', { ascending: true }),
+        _supabase.from('consultations').select('*'),
+        _supabase.from('handovers').select('*').neq('push_status', 'Sent'),
+        _supabase.from('schedules').select('*')
       ]);
 
-      latestLeaveRows = leaveRows;
+      const pad = n => String(n).padStart(2, '0');
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = pad(now.getMonth() + 1);
+      const d = pad(now.getDate());
+      const todaySlash = `${y}/${m}/${d}`;
+      const todayDash = `${y}-${m}-${d}`;
+
+      const zhWeekdays = ['週日', '週一', '週二', '週三', '週四', '週五', '週六'];
+      const targetZhWeek = zhWeekdays[now.getDay()];
 
       let todayScheduleList = [];
 
-      const zhWeekdays = ['週日', '週一', '週二', '週三', '週四', '週五', '週六'];
-      const zhShortWeekdays = ['日', '一', '二', '三', '四', '五', '六'];
-      const targetZhWeek = zhWeekdays[todayObj.getDay()];
-      const targetZhShortWeek = zhShortWeekdays[todayObj.getDay()];
+      // 建立指派人對照 Map
+      const assignMap = {};
+      (taskData || []).filter(t => t.category === 'assign').forEach(a => {
+        if (a.title && a.executor) assignMap[a.title] = a.executor;
+      });
 
-      if (weekRows.length > 1) {
-        weekRows.slice(1).forEach(r => {
-          if (!r || !r.c) return;
-          const row = r.c.map(parseCellText);
-          const val = (row[0] || '').toString().trim();
-          if (val.includes(targetZhWeek) || val.includes(targetZhShortWeek) || val === String(todayObj.getDay())) {
-            todayScheduleList.push({
-              assigned: '全員',
-              content: `${getPriorityBadge(row[2])} ${row[1]||''}`
-            });
-          }
+      // (A) 週工作：加入今日所有項目，若有指派專人則帶入姓名
+      (taskData || []).filter(t => t.category === 'weekly' && t.title === targetZhWeek).forEach(t => {
+        const assignKey = `[週] ${t.title}：${t.content}`;
+        const executor = assignMap[assignKey] || (t.need_assign ? '未指派' : '全員');
+        todayScheduleList.push({
+          assigned: executor,
+          content: `${getPriorityBadge(t.priority)} ${t.content || ''}`
         });
-      }
+      });
 
-      if (dayRows.length > 1) {
-        dayRows.slice(1).forEach(r => {
-          if (!r || !r.c) return;
-          const row = r.c.map(parseCellText);
-          const val = (row[0] || '').toString().trim();
-          if (val === String(dateNum) || val === dateNumStr || val === `${dateNum}號` || val === `${dateNum}日`) {
-            todayScheduleList.push({
-              assigned: '全員',
-              content: `${getPriorityBadge(row[2])} ${row[1]||''}`
-            });
-          }
+      // (B) 月工作：加入今日所有項目
+      const dateNumStr = `${parseInt(d, 10)}號`;
+      (taskData || []).filter(t => t.category === 'monthly' && t.title === dateNumStr).forEach(t => {
+        const assignKey = `[月] ${t.title}：${t.content}`;
+        const executor = assignMap[assignKey] || (t.need_assign ? '未指派' : '全員');
+        todayScheduleList.push({
+          assigned: executor,
+          content: `${getPriorityBadge(t.priority)} ${t.content || ''}`
         });
-      }
+      });
 
-      if (timeHandoverRows.length > 1) {
-        timeHandoverRows.slice(1).forEach(r => {
-          if (!r || !r.c) return;
-          const row = r.c.map(parseCellText);
-          if (isToday(row[0]) || isToday(row[5])) {
-            const timeStr = extractTimeText(r.c[5] || r.c[0]);
-            const timeSuffix = timeStr ? ` ${timeStr}` : '';
-            todayScheduleList.push({
-              assigned: row[3] || row[4] || '全員',
-              content: `<span class="badge badge-time">[指定時間]</span> ${row[2]||''}${timeSuffix}`
-            });
-          }
-        });
-      }
+      // (C) 今日指定時間交接、追蹤、物流
+      (handoverData || []).forEach(h => {
+        const tDate = String(h.target_date || '').trim();
+        const isTodayTarget = tDate.startsWith(todaySlash) || tDate.startsWith(todayDash);
 
-      if (handoverRows.length > 1) {
-        handoverRows.slice(1).forEach(r => {
-          if (!r || !r.c) return;
-          const row = r.c.map(parseCellText);
-          if (isToday(row[0]) || isToday(row[5]) || true) {
-            todayScheduleList.push({
-              assigned: row[3] || row[4] || '全員',
-              content: `<span class="badge badge-track">[追蹤工作]</span> ${row[2]||''}`
-            });
-          }
-        });
-      }
+        if (h.type && h.type.includes('指定') && isTodayTarget) {
+          todayScheduleList.push({
+            assigned: h.to_staff || '全員',
+            content: `<span class="badge badge-time">[指定時間]</span> ${h.content || ''}`
+          });
+        } else if (h.type && h.type.includes('追蹤')) {
+          todayScheduleList.push({
+            assigned: h.to_staff || '全員',
+            content: `<span class="badge badge-track">[追蹤工作]</span> ${h.content || ''}`
+          });
+        } else if (h.type && h.type.includes('物流')) {
+          todayScheduleList.push({
+            assigned: h.to_staff || '全員',
+            content: `<span class="badge badge-track">[物流]</span> ${h.content || ''}`
+          });
+        }
+      });
 
-      if (logisticsRows.length > 1) {
-        logisticsRows.slice(1).forEach(r => {
-          if (!r || !r.c) return;
-          const row = r.c.map(parseCellText);
-          if (isToday(row[0]) || isToday(row[5]) || true) {
-            todayScheduleList.push({
-              assigned: row[3] || row[4] || '全員',
-              content: `<span class="badge badge-track">[物流]</span> ${row[2]||''}`
-            });
-          }
-        });
-      }
-
+      // (D) 今日諮詢預約
       let appointSummaryList = [];
-      if (appointRows.length > 1) {
-        appointRows.slice(1).forEach(r => {
-          if (!r || !r.c) return;
-          const row = r.c.map(parseCellText);
-          if (isToday(row[5]) || isToday(row[0])) {
-            const clientName = row[1] || '';
-            const phone = row[4] ? ` (${row[4]})` : '';
-            const eventContent = row[2] || '';
-            const rawTime = extractTimeText(r.c[5] || r.c[0]);
-            const timeSuffix = rawTime ? ` ${rawTime}` : '';
+      (consultData || []).forEach(c => {
+        const aTime = String(c.appoint_time || '').trim();
+        const isTodayAppoint = (c.is_appoint === '是' && (aTime.startsWith(todayDash) || aTime.startsWith(todaySlash)));
 
-            todayScheduleList.push({
-              assigned: row[3] || '全員',
-              content: `<span class="badge badge-appoint">[預約]</span> ${clientName ? clientName : ''}${phone}：${eventContent}${timeSuffix}`
-            });
+        if (isTodayAppoint) {
+          const clientName = c.name || '';
+          const phone = c.phone ? ` (${c.phone})` : '';
+          const eventContent = c.event || '';
+          const timeStr = aTime.includes('T') ? aTime.split('T')[1].substring(0, 5) : aTime.substring(11, 16);
 
-            if (clientName) appointSummaryList.push(`${clientName}(${eventContent}${rawTime ? ' ' + rawTime : ''})`);
-          }
+          todayScheduleList.push({
+            assigned: c.staff || '全員',
+            content: `<span class="badge badge-appoint">[預約]</span> ${clientName}${phone}：${eventContent} ${timeStr}`
+          });
+
+          if (clientName) appointSummaryList.push(`${clientName}(${eventContent} ${timeStr})`);
+        }
+      });
+
+      // ================= 替換：Doctor's notice (直連 Supabase doctor_shift_changes) =================
+      const { data: docChanges } = await _supabase
+        .from('doctor_shift_changes')
+        .select('*')
+        .gte('date', todayDash) // 查詢今天起未來的所有醫師請假/代診/異動
+        .order('date', { ascending: true });
+
+      const docGroupMap = {};
+
+      (docChanges || []).forEach(r => {
+        // 排除已取消的異動
+        if (r.type === '取消異動') return;
+
+        const docName = r.old_staff || '醫師';
+        const dateParts = r.date.split('-');
+        const dateShort = `${parseInt(dateParts[1], 10)}/${parseInt(dateParts[2], 10)}`;
+        const shiftShort = (r.shift || '').replace('班', '診');
+
+        // 產生變更描述：如 (換)林醫師 或 (請)
+        let changeDesc = `(${r.type})`;
+        if (r.type === '換班' && r.new_staff && r.new_staff !== r.old_staff) {
+          changeDesc = `(換)${r.new_staff}`;
+        } else if (r.type === '請假') {
+          changeDesc = `(請)`;
+        } else if (r.type === '僅輸入備註') {
+          changeDesc = r.note ? `(${r.note})` : `(備註)`;
+        }
+
+        if (!docGroupMap[docName]) docGroupMap[docName] = [];
+        docGroupMap[docName].push(`${dateShort}${shiftShort}${changeDesc}`);
+      });
+
+      let docNoticeHtml = '';
+      const docNames = Object.keys(docGroupMap);
+
+      if (docNames.length > 0) {
+        docNames.forEach(name => {
+          const dateListStr = docGroupMap[name].join('、');
+          docNoticeHtml += `
+            <div class="doc-card">
+              <div class="doc-name-title">👨‍⚕️ ${name} 醫師異動：</div>
+              <div class="doc-dates-text">${dateListStr}</div>
+            </div>
+          `;
         });
+      } else {
+        docNoticeHtml = '<div class="center" style="color:#a0aec0; margin-top:10px;">-無醫師請假資料-</div>';
       }
 
-      latestWorkItems = todayScheduleList;
-      latestAppointSummaryList = appointSummaryList;
+      // 渲染到右側 Doctor's notice 欄位
+      document.getElementById('col-doctor-notice').innerHTML = docNoticeHtml;
+      // ==============================================================================================
 
+      // 依重要性優先度排序：高 > 中 > 低 (其他項目次之)
+      const getPriorityWeight = (contentStr) => {
+        if (!contentStr) return 4;
+        if (contentStr.includes('badge-high') || contentStr.includes('[高]')) return 1;
+        if (contentStr.includes('[中]')) return 2;
+        if (contentStr.includes('[低]')) return 3;
+        return 4;
+      };
+
+      todayScheduleList.sort((a, b) => {
+        const weightA = getPriorityWeight(a.content);
+        const weightB = getPriorityWeight(b.content);
+        return weightA - weightB;
+      });
+
+      // 渲染主表格
       const tbSchedule = document.getElementById('tb-todays-schedule');
       let scheduleHtml = '';
-
       if (todayScheduleList.length > 0) {
         scheduleHtml += todayScheduleList.map(item => `
           <tr>
@@ -748,155 +846,84 @@
         `).join('');
       }
 
-      const emptyCount = Math.max(2, 15 - todayScheduleList.length);
+      const emptyCount = Math.max(2, 14 - todayScheduleList.length);
       for (let i = 0; i < emptyCount; i++) {
-        scheduleHtml += `
-          <tr>
-            <td class="center">&nbsp;</td>
-            <td>&nbsp;</td>
-          </tr>
-        `;
+        scheduleHtml += `<tr><td class="center">&nbsp;</td><td>&nbsp;</td></tr>`;
       }
-
       tbSchedule.innerHTML = scheduleHtml;
 
-      // 下一個營業日
-      const nextWorkdayObj = findNextWorkday(rosterRows);
-      const nextMonthNum = nextWorkdayObj.getMonth() + 1;
-      const nextDateNum = nextWorkdayObj.getDate();
-      const nextDayZh = zhWeekdaysShort[nextWorkdayObj.getDay()];
+      // ================= 次營業日日程自動判讀 =================
+      const nextWorkdayObj = findNextWorkday(rosterData);
+      const nextY = nextWorkdayObj.getFullYear();
+      const nextM = pad(nextWorkdayObj.getMonth() + 1);
+      const nextD = pad(nextWorkdayObj.getDate());
+      const nextSlash = `${nextY}/${nextM}/${nextD}`;
+      const nextDash = `${nextY}-${nextM}-${nextD}`;
+      const nextDayZh = ['日', '一', '二', '三', '四', '五', '六'][nextWorkdayObj.getDay()];
 
-      document.getElementById('title-next-workday').innerText = `Next Workday Schedule (${nextMonthNum}/${nextDateNum} ${nextDayZh})`;
+      const titleNextEl = document.getElementById('title-next-workday');
+      if (titleNextEl) {
+        titleNextEl.innerText = `Next Workday Schedule (${parseInt(nextM,10)}/${parseInt(nextD,10)} ${nextDayZh})`;
+      }
 
-      // 擷取下一個營業日事項
-      let nextWorkdayScheduleList = [];
-      if (timeHandoverRows.length > 1) {
-        timeHandoverRows.slice(1).forEach(r => {
-          if (!r || !r.c) return;
-          const row = r.c.map(parseCellText);
-          if (checkDateMatch(nextWorkdayObj, row[0]) || checkDateMatch(nextWorkdayObj, row[5])) {
-            const rawTime = extractTimeText(r.c[5] || r.c[0]);
-            const timeSuffix = rawTime ? ` ${rawTime}` : '';
-            nextWorkdayScheduleList.push(`<span class="badge badge-time">[指定時間]</span> ${row[2]||''}${timeSuffix}`);
-          }
-        });
-      }
-      if (appointRows.length > 1) {
-        appointRows.slice(1).forEach(r => {
-          if (!r || !r.c) return;
-          const row = r.c.map(parseCellText);
-          if (checkDateMatch(nextWorkdayObj, row[5]) || checkDateMatch(nextWorkdayObj, row[0])) {
-            const clientName = row[1] || '';
-            const phone = row[4] ? ` (${row[4]})` : '';
-            const eventContent = row[2] || '';
-            const rawTime = extractTimeText(r.c[5] || r.c[0]);
-            nextWorkdayScheduleList.push(`<span class="badge badge-appoint">[預約]</span> ${clientName ? clientName : ''}${phone}：${eventContent}${rawTime ? ' ' + rawTime : ''}`);
-          }
-        });
-      }
+      let nextWorkdayItems = [];
+
+      // 1. 次營業日：指定時間交接
+      (handoverData || []).forEach(h => {
+        const tDate = String(h.target_date || '').trim();
+        if (h.type && h.type.includes('指定') && (tDate.startsWith(nextSlash) || tDate.startsWith(nextDash))) {
+          nextWorkdayItems.push(`<span class="badge badge-time">[指定時間]</span> ${h.content || ''}`);
+        }
+      });
+
+      // 2. 次營業日：諮詢預約
+      (consultData || []).forEach(c => {
+        const aTime = String(c.appoint_time || '').trim();
+        if (c.is_appoint === '是' && (aTime.startsWith(nextDash) || aTime.startsWith(nextSlash))) {
+          const clientName = c.name || '';
+          const phone = c.phone ? ` (${c.phone})` : '';
+          const eventContent = c.event || '';
+          const timeStr = aTime.includes('T') ? aTime.split('T')[1].substring(0, 5) : aTime.substring(11, 16);
+          nextWorkdayItems.push(`<span class="badge badge-appoint">[預約]</span> ${clientName}${phone}：${eventContent} ${timeStr}`);
+        }
+      });
 
       const colTomorrow = document.getElementById('col-tomorrows-schedule');
-      if (nextWorkdayScheduleList.length > 0) {
-        colTomorrow.innerHTML = nextWorkdayScheduleList.map(item => `<div style="margin-bottom:3px;">• ${item}</div>`).join('');
-      } else {
-        colTomorrow.innerHTML = '<div class="center" style="color:#a0aec0; padding: 15px 0;">-無預約與交接事項-</div>';
+      if (colTomorrow) {
+        if (nextWorkdayItems.length > 0) {
+          colTomorrow.innerHTML = nextWorkdayItems.map(item => `<div style="margin-bottom:3px;">• ${item}</div>`).join('');
+        } else {
+          colTomorrow.innerHTML = '<div class="center" style="color:#a0aec0; padding: 15px 0;">-無預約與交接事項-</div>';
+        }
       }
 
-      // Doctor's notice
-      const docGroupMap = {};
-      if (leaveRows && leaveRows.length > 1) {
-        leaveRows.slice(1).forEach(r => {
-          if (!r || !r.c) return;
-          const dateText = parseCellText(r.c[0]);
-          if (!dateText) return;
-
-          const match = dateText.match(/(?:(\d{4})[/-])?(\d{1,2})[/-](\d{1,2})/);
-          if (match) {
-            const parsedYear = match[1] ? parseInt(match[1], 10) : year;
-            const parsedMonth = parseInt(match[2], 10);
-            const parsedDay = parseInt(match[3], 10);
-
-            const rowData = r.c.map(parseCellText);
-            const shift = rowData[1] || '';
-            const docName = rowData[2] || '醫師';
-            const type = rowData[3] || '請';
-            const subDoc = rowData[4] ? `(換)${rowData[4]}` : `(${type})`;
-
-            const timestamp = new Date(parsedYear, parsedMonth - 1, parsedDay).getTime();
-            const dateShort = `${parsedMonth}/${parsedDay}`;
-
-            if (!docGroupMap[docName]) docGroupMap[docName] = [];
-
-            docGroupMap[docName].push({
-              timestamp: timestamp,
-              dateShort: dateShort,
-              shift: shift,
-              subDoc: subDoc
-            });
-          }
-        });
-      }
-
-      let docNoticeHtml = '';
-      const docNames = Object.keys(docGroupMap);
-      if (docNames.length > 0) {
-        docNames.forEach(name => {
-          const list = docGroupMap[name];
-          list.sort((a, b) => a.timestamp - b.timestamp);
-          const dateDescPairs = list.map(item => `${item.dateShort}${item.shift}${item.subDoc}`);
-
-          docNoticeHtml += `
-            <div class="doc-card">
-              <div class="doc-name-title">👨‍⚕️ ${name} 醫師異動：</div>
-              <div class="doc-dates-text">${dateDescPairs.join('、')}</div>
-            </div>
-          `;
-        });
-      } else {
-        docNoticeHtml = '<div class="center" style="color:#a0aec0; margin-top:10px;">-無醫師請假資料-</div>';
-      }
-      document.getElementById('col-doctor-notice').innerHTML = docNoticeHtml;
-
-      // 【今日上班人員】
-      let rosterItems = [];
-      if (rosterRows && rosterRows.length > 1) {
-        rosterRows.slice(1).forEach(r => {
-          if (!r || !r.c) return;
-          const rowData = r.c.map(parseCellText);
-          if (isToday(rowData[0])) {
-            const shiftName = rowData[2] || '';
-            const staffNames = rowData[1] || '';
-            if (staffNames) {
-              rosterItems.push(`<span class="staff-inline-item"><strong>${staffNames}</strong>(${shiftName})</span>`);
-            }
-          }
-        });
-      }
+      // 今日出勤班表單列
+      const todayRoster = (rosterData || []).filter(s => {
+        const sDate = String(s.date || '').trim();
+        return (sDate === todaySlash || sDate === todayDash) && s.shift_type && s.shift_type !== '休假';
+      });
 
       const colRoster = document.getElementById('col-staff-roster');
-      if (rosterItems.length > 0) {
-        colRoster.innerHTML = `<span class="staff-title">【今日上班人員】</span>` + rosterItems.join('');
-      } else {
-        colRoster.innerHTML = `
-          <span class="staff-title">【今日上班人員】</span>
-          <span class="staff-inline-item"><strong>林哲玄</strong>(早班)</span>
-          <span class="staff-inline-item"><strong>黃政中</strong>(晚班)</span>
-          <span class="staff-inline-item"><strong>陳昱伶</strong>(結帳)</span>
-          <span class="staff-inline-item"><strong>吳曉婷</strong>(值日)</span>
-        `;
+      if (colRoster) {
+        if (todayRoster.length > 0) {
+          const rosterBadges = todayRoster.map(s => `<span class="staff-inline-item"><strong>${s.staff_name}</strong>(${s.shift_type})</span>`).join('');
+          colRoster.innerHTML = `<span class="staff-title">【今日上班人員】</span>` + rosterBadges;
+        } else {
+          colRoster.innerHTML = `<span class="staff-title">【今日上班人員】</span><span style="color:#a0aec0;">本日無排班紀錄</span>`;
+        }
       }
 
-      // 改為本地資料彙整
-      generateLocalSummary(todayScheduleList, appointSummaryList, leaveRows);
-
+      generateLocalSummary(todayScheduleList, appointSummaryList, []);
     } catch (err) {
-      console.error("載入發生例外錯誤：", err);
+      console.error("日報載入失敗:", err);
     } finally {
-      maskEl.style.opacity = '0';
-      setTimeout(() => {
-        maskEl.style.visibility = 'hidden';
-        maskEl.style.display = 'none';
-      }, 400);
+      if (maskEl) {
+        maskEl.style.opacity = '0';
+        setTimeout(() => {
+          maskEl.style.visibility = 'hidden';
+          maskEl.style.display = 'none';
+        }, 400);
+      }
     }
   }
 
