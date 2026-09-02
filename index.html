@@ -5,7 +5,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <title>大學眼鏡桃園南崁 - 工作簡報</title>
 <style>
   @page {
@@ -482,10 +482,7 @@
   </div>
 
 <script>
-  // 🔑 API Key
-  const GEMINI_API_KEY = 'AIzaSyB3cPMa60muqqeGtmNjArLS6fWvxil7Juc';
-
-  const SHEET_ID = '1ypmvlBQ6HvIYLRQbKX2q3gosZtJCff3bCfrdX6sJ8YI';
+  
   const GIDS = {
     week: '742211352',
     day: '99976034',
@@ -644,9 +641,8 @@
     return tomorrow;
   }
 
-  const SUPABASE_URL = "https://niytitszugkfsfdwlwqt.supabase.co";
-  const SUPABASE_KEY = "sb_publishable_dsxxWLXxfbTHmXOfmEUUfA_Y8h1tykR";
-  const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  // ★ 安全防護：Supabase 與 Gemini 金鑰已全數收攏至 Cloudflare Worker
+  const API_BASE_URL = "https://dailyreport-security.abc552211.workers.dev";
 
   /* 自動依據班表，尋找下一個全店有上班的營業日 */
   function findNextWorkday(scheduleList) {
@@ -687,19 +683,6 @@
     }
 
     try {
-      // 1. 批次向 Supabase 撈取所有所需資料
-      const [
-        { data: taskData },
-        { data: consultData },
-        { data: handoverData },
-        { data: rosterData }
-      ] = await Promise.all([
-        _supabase.from('task_configs').select('*').order('item_order', { ascending: true }),
-        _supabase.from('consultations').select('*'),
-        _supabase.from('handovers').select('*').neq('push_status', 'Sent'),
-        _supabase.from('schedules').select('*')
-      ]);
-
       const pad = n => String(n).padStart(2, '0');
       const now = new Date();
       const y = now.getFullYear();
@@ -707,6 +690,11 @@
       const d = pad(now.getDate());
       const todaySlash = `${y}/${m}/${d}`;
       const todayDash = `${y}-${m}-${d}`;
+
+      // 1. 透過 Cloudflare Worker 單次安全取得所有簡報數據
+      const res = await fetch(`${API_BASE_URL}/api/daily-data?today=${todayDash}`);
+      if (!res.ok) throw new Error(`後端讀取失敗 (${res.status})`);
+      const { taskData, consultData, handoverData, rosterData, docChanges } = await res.json();
 
       const zhWeekdays = ['週日', '週一', '週二', '週三', '週四', '週五', '週六'];
       const targetZhWeek = zhWeekdays[now.getDay()];
@@ -792,13 +780,6 @@
           if (clientName) appointSummaryList.push(`${clientName}(${eventContent} ${timeStr})`);
         }
       });
-
-      // ================= 替換：Doctor's notice (直連 Supabase doctor_shift_changes) =================
-      const { data: docChanges } = await _supabase
-        .from('doctor_shift_changes')
-        .select('*')
-        .gte('date', todayDash) // 查詢今天起未來的所有醫師請假/代診/異動
-        .order('date', { ascending: true });
 
       // docGroupMap 結構: { 醫師姓名: { "M/D": [ "早診(請)", "午診(換)林醫師" ] } }
       const docGroupMap = {};
@@ -1037,19 +1018,19 @@
     // 注入新排版 HTML
     summaryEl.innerHTML = `
       <div class="dash-card" style="${hrBg}">
-        <div class="dash-card-title">👨‍⚕️ 醫師人力</div>
+        <div class="dash-card-title">醫師</div>
         <div class="dash-card-value">${hrText}</div>
       </div>
       <div class="dash-card" style="${priBg}">
-        <div class="dash-card-title">🔥 優先急件</div>
+        <div class="dash-card-title">優先急件</div>
         <div class="dash-card-value">${priText}</div>
       </div>
       <div class="dash-card" style="flex: 1.5; background-color:#ebf8ff; border-color:#bee3f8;">
-        <div class="dash-card-title">📊 今日營運任務</div>
+        <div class="dash-card-title">今日營運任務</div>
         <div class="dash-card-value">${opsText}</div>
       </div>
       <div class="dash-card" style="${prepBg}">
-        <div class="dash-card-title">⏩ 次日準備</div>
+        <div class="dash-card-title">次日準備</div>
         <div class="dash-card-value">${prepText}</div>
       </div>
     `;
