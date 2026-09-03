@@ -565,16 +565,27 @@
     return rawStr;
   }
 
-  function checkDateMatch(targetDateObj, cellStr) {
-    if (!cellStr) return false;
-    const cleanStr = cellStr.toString().replace(/-/g, '/');
-    const y = targetDateObj.getFullYear();
-    const m = targetDateObj.getMonth() + 1;
-    const d = targetDateObj.getDate();
+  // 強韌日期比對：支援 YYYY/MM/DD、YYYY-MM-DD、未補零 (2026/9/3) 及 ISO 格式
+  function isSameDay(targetDateObj, dateStr) {
+    if (!dateStr) return false;
+    const clean = String(dateStr).trim().replace('T', ' ').replace(/-/g, '/');
+    const datePart = clean.split(' ')[0];
+    const parts = datePart.split('/');
+    if (parts.length < 3) return false;
     
-    const fullStr = `${y}/${String(m).padStart(2, '0')}/${String(d).padStart(2, '0')}`;
-    const shortStr = `${m}/${d}`;
-    return cleanStr.includes(fullStr) || cleanStr.includes(shortStr);
+    const y = parseInt(parts[0], 10);
+    const m = parseInt(parts[1], 10);
+    const d = parseInt(parts[2], 10);
+    
+    return (
+      y === targetDateObj.getFullYear() &&
+      m === (targetDateObj.getMonth() + 1) &&
+      d === targetDateObj.getDate()
+    );
+  }
+
+  function checkDateMatch(targetDateObj, cellStr) {
+    return isSameDay(targetDateObj, cellStr);
   }
 
   const todayObj = new Date();
@@ -737,10 +748,9 @@
         });
       });
 
-      // (C) 今日指定時間交接、追蹤、物流
+      // (C) 今日指定時間交接、追蹤、物流 (使用 isSameDay 精準抓取)
       (handoverData || []).forEach(h => {
-        const tDate = String(h.target_date || '').trim();
-        const isTodayTarget = tDate.startsWith(todaySlash) || tDate.startsWith(todayDash);
+        const isTodayTarget = isSameDay(now, h.target_date);
 
         if (h.type && h.type.includes('指定') && isTodayTarget) {
           todayScheduleList.push({
@@ -909,10 +919,9 @@
         nextWorkdayItems.push(...nextWorkdayDocItems);
       }
 
-      // 1. 次營業日：指定時間交接
+      // 1. 次營業日：指定時間交接 (使用 isSameDay 精準抓取)
       (handoverData || []).forEach(h => {
-        const tDate = String(h.target_date || '').trim();
-        if (h.type && h.type.includes('指定') && (tDate.startsWith(nextSlash) || tDate.startsWith(nextDash))) {
+        if (h.type && h.type.includes('指定') && isSameDay(nextWorkdayObj, h.target_date)) {
           nextWorkdayItems.push(`<span class="badge badge-time">[指定時間]</span> ${h.content || ''}`);
         }
       });
