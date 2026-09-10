@@ -197,6 +197,8 @@
   .badge-track { background-color: #e6fffa; color: #234e52; border: 1px solid #b2f5ea; }
   .badge-appoint { background-color: #faf5ff; color: #553c9a; border: 1px solid #e9d8fd; }
   .badge-doc { background-color: #fff5f5; color: #c53030; border: 1px solid #feb2b2; }
+  .badge-limited { background-color: #efe8f4; color: #6d597a; border: 1px solid #d6c7df; }
+  .badge-limited-end { background-color: #f3e8ff; color: #702459; border: 1px solid #d8b4fe; }
 
   /* 下半區：左右 2 大欄配置 (調整為各 50% 均衡分配) */
   .bottom-layout {
@@ -748,11 +750,40 @@
         });
       });
 
-      // (C) 今日指定時間交接、追蹤、物流 (使用 isSameDay 精準抓取)
+      // (C) 今日指定時間交接、追蹤、物流、限時 (使用 isSameDay 與區間比對)
       (handoverData || []).forEach(h => {
         const isTodayTarget = isSameDay(now, h.target_date);
+        const isLimited = h.type && h.type.includes('限時');
 
-        if (h.type && h.type.includes('指定') && isTodayTarget) {
+        if (isLimited && String(h.target_date || '').includes('~')) {
+          const parts = String(h.target_date).split('~').map(s => s.trim());
+          const startStr = parts[0];
+          const endStr = parts[1];
+          const startDate = new Date(startStr.replace(/-/g, '/'));
+          const endDate = new Date(endStr.replace(/-/g, '/'));
+
+          if (!isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
+            const todayZero = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+            const startZero = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate()).getTime();
+            const endZero = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate()).getTime();
+
+            if (todayZero === endZero) {
+              // 最後一天：像指定時間一樣顯示截止提醒與時間
+              const timeMatch = endStr.match(/(\d{1,2}:\d{2})/);
+              const endTimeStr = timeMatch ? ` ${timeMatch[1]}` : '';
+              todayScheduleList.push({
+                assigned: h.to_staff || '全員',
+                content: `<span class="badge badge-limited-end">[限時截止]</span> ${h.content || ''}${endTimeStr}`
+              });
+            } else if (todayZero >= startZero && todayZero < endZero) {
+              // 期間內（非最後一天）：像追蹤工作一樣每天顯示
+              todayScheduleList.push({
+                assigned: h.to_staff || '全員',
+                content: `<span class="badge badge-limited">[限時追蹤]</span> ${h.content || ''}`
+              });
+            }
+          }
+        } else if (h.type && h.type.includes('指定') && isTodayTarget) {
           todayScheduleList.push({
             assigned: h.to_staff || '全員',
             content: `<span class="badge badge-time">[指定時間]</span> ${h.content || ''}`
@@ -919,10 +950,18 @@
         nextWorkdayItems.push(...nextWorkdayDocItems);
       }
 
-      // 1. 次營業日：指定時間交接 (使用 isSameDay 精準抓取)
+      // 1. 次營業日：指定時間交接與限時截止日 (使用 isSameDay 精準抓取)
       (handoverData || []).forEach(h => {
         if (h.type && h.type.includes('指定') && isSameDay(nextWorkdayObj, h.target_date)) {
           nextWorkdayItems.push(`<span class="badge badge-time">[指定時間]</span> ${h.content || ''}`);
+        } else if (h.type && h.type.includes('限時') && String(h.target_date || '').includes('~')) {
+          const parts = String(h.target_date).split('~').map(s => s.trim());
+          const endStr = parts[1];
+          if (isSameDay(nextWorkdayObj, endStr)) {
+            const timeMatch = endStr.match(/(\d{1,2}:\d{2})/);
+            const endTimeStr = timeMatch ? ` ${timeMatch[1]}` : '';
+            nextWorkdayItems.push(`<span class="badge badge-limited-end">[限時截止]</span> ${h.content || ''}${endTimeStr}`);
+          }
         }
       });
 
@@ -992,8 +1031,8 @@
     
     workItems.forEach(item => {
       const content = item.content || '';
-      if (content.includes('badge-high')) highPriorityCount++;
-      if (content.includes('[追蹤工作]')) trackCount++;
+      if (content.includes('badge-high') || content.includes('[限時截止]')) highPriorityCount++;
+      if (content.includes('[追蹤工作]') || content.includes('[限時追蹤]')) trackCount++;
       if (content.includes('[物流]')) logisticsCount++;
     });
 
