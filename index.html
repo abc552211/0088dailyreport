@@ -731,8 +731,9 @@
 
       // (A) 週工作：加入今日所有項目，若有指派專人則帶入姓名
       (taskData || []).filter(t => t.category === 'weekly' && t.title === targetZhWeek).forEach(t => {
-        const assignKey = `[週] ${t.title}：${t.content}`;
-        const executor = assignMap[assignKey] || (t.need_assign ? '未指派' : '全員');
+        const cleanContent = (t.content || '').trim();
+        const assignKeyOld = `[週] ${t.title}：${cleanContent}`;
+        const executor = assignMap[cleanContent] || assignMap[assignKeyOld] || (t.need_assign ? '未指派' : '全員');
         todayScheduleList.push({
           assigned: executor,
           content: `${getPriorityBadge(t.priority)} ${t.content || ''}`
@@ -742,8 +743,9 @@
       // (B) 月工作：加入今日所有項目
       const dateNumStr = `${parseInt(d, 10)}號`;
       (taskData || []).filter(t => t.category === 'monthly' && t.title === dateNumStr).forEach(t => {
-        const assignKey = `[月] ${t.title}：${t.content}`;
-        const executor = assignMap[assignKey] || (t.need_assign ? '未指派' : '全員');
+        const cleanContent = (t.content || '').trim();
+        const assignKeyOld = `[月] ${t.title}：${cleanContent}`;
+        const executor = assignMap[cleanContent] || assignMap[assignKeyOld] || (t.need_assign ? '未指派' : '全員');
         todayScheduleList.push({
           assigned: executor,
           content: `${getPriorityBadge(t.priority)} ${t.content || ''}`
