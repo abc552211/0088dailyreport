@@ -803,24 +803,49 @@
         }
       });
 
-      // (D) 今日諮詢預約
+      // (D) 諮詢預約（含今日預約與前一營業日/逾期未赴約結案項目）
       let appointSummaryList = [];
+      const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+
       (consultData || []).forEach(c => {
-        const aTime = String(c.appoint_time || '').trim();
-        const isTodayAppoint = (c.is_appoint === '是' && (aTime.startsWith(todayDash) || aTime.startsWith(todaySlash)));
+        const rawTime = c.appoint_time || c.appointTime || c.time || '';
+        const aTime = String(rawTime).trim();
+        if (!aTime) return;
 
-        if (isTodayAppoint) {
-          const clientName = c.name || '';
-          const phone = c.phone ? ` (${c.phone})` : '';
-          const eventContent = c.event || '';
-          const timeStr = aTime.includes('T') ? aTime.split('T')[1].substring(0, 5) : aTime.substring(11, 16);
+        // 結案狀態排除
+        const status = (c.status || '').trim();
+        if (status !== '' && status !== '待處理' && status !== '已關懷') return;
 
+        const clientName = c.name || '';
+        const phone = c.phone ? ` (${c.phone})` : '';
+        const eventContent = c.event || '';
+
+        // 提取時間文字 (HH:mm)
+        let timePart = '';
+        const timeMatch = aTime.match(/(\d{1,2}:\d{2})/);
+        if (timeMatch) timePart = timeMatch[1];
+
+        // 解析日期進行比較
+        const cleanDateStr = aTime.replace('T', ' ').replace(/-/g, '/').split(' ')[0];
+        const appDateObj = new Date(cleanDateStr);
+        const appMidnight = !isNaN(appDateObj.getTime()) ? new Date(appDateObj.getFullYear(), appDateObj.getMonth(), appDateObj.getDate()).getTime() : null;
+
+        const isToday = isSameDay(now, aTime) || aTime.includes(todayDash) || aTime.includes(todaySlash);
+
+        if (isToday) {
+          // 今日預約
           todayScheduleList.push({
             assigned: c.staff || '全員',
-            content: `<span class="badge badge-appoint">[預約]</span> ${clientName}${phone}：${eventContent} ${timeStr}`
+            content: `<span class="badge badge-appoint">[預約]</span> ${clientName}${phone}：${eventContent} ${timePart}`
           });
-
-          if (clientName) appointSummaryList.push(`${clientName}(${eventContent} ${timeStr})`);
+          if (clientName) appointSummaryList.push(`${clientName}(${eventContent} ${timePart})`);
+        } else if (appMidnight !== null && appMidnight < todayMidnight) {
+          // 🚨 前一營業日或更早的未結案預約（逾期警示）
+          const dShort = `${appDateObj.getMonth() + 1}/${appDateObj.getDate()}`;
+          todayScheduleList.push({
+            assigned: c.staff || '全員',
+            content: `<span class="badge badge-high">[逾期預約]</span> ${clientName}${phone}：${eventContent} (原約: ${dShort} ${timePart})`
+          });
         }
       });
 
